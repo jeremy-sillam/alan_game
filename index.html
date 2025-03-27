@@ -1,0 +1,1137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="fr"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Les 100 premiers Alaniens&lt;/title&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Inclure React (version production) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/react@17/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Inclure PapaParse pour le traitement CSV --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Métadonnées pour le partage social --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta property="og:title" content="Les 100 premiers Alaniens"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta property="og:description" content="Jeu de devinettes sur les employés d'Alan"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta property="og:type" content="website"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f9fafb;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#root {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Le code du jeu --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Destructurer les éléments React nécessaires</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const { useState, useEffect, useRef } = React;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Données complètes des employés</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const donneesBrutes = `employee_id,first_name,last_name,original_start_date,community,role,first_initial,last_initial</p>
+<p class="p1">0,Jean-Charles,Samuelian,"1 Jan, 2016",Co-founders,CEO,J,S</p>
+<p class="p1">1,Charles,Gorintin,"1 Jan, 2016",Co-founders,CTO,C,G</p>
+<p class="p1">3,Antoine,Lizee,"9 May, 2016",Data,Full Stack Data Scientist,A,L</p>
+<p class="p1">4,Robert,Zyskowski,"23 May, 2016",Engineering,Software Engineer,R,Z</p>
+<p class="p1">6,Paul,Sauveplane,"20 Jun, 2016",Market and Bet Owners,Alaner Experience Lead,P,S</p>
+<p class="p1">8,Fabrice,Staad,"1 Aug, 2016",Market and Bet Owners,Unit Lead - France,F,S</p>
+<p class="p1">10,Kevin,Aserraf,"6 Mar, 2017",Marketing,Product Marketing,K,A</p>
+<p class="p1">13,Olivier,Sambourg,"6 Jun, 2017",Engineering,Software Engineer,O,S</p>
+<p class="p1">15,James,Whitbeck,"4 Sep, 2017",Engineering,Software Engineer,J,W</p>
+<p class="p1">19,Leo,Andres,"8 Jan, 2018",Care,Care Crew Lead,L,A</p>
+<p class="p1">23,Vincent,Brachet,"9 Apr, 2018",Sales,Sales Crew Lead,V,B</p>
+<p class="p1">22,Clement,Mennesson,"4 Jun, 2018",Product Management,Product Manager,C,M</p>
+<p class="p1">24,Thomas,Rolf,"18 Jun, 2018",Product Management,Community Lead,T,R</p>
+<p class="p1">28,Marie,Hardel,"2 Jul, 2018",Care,Community Lead,M,H</p>
+<p class="p1">34,Cyril,Vinot,"3 Jul, 2018",Data,Full Stack Data Scientist,C,V</p>
+<p class="p1">46,Benjamin,Benouarka,"24 Sep, 2018",IT,IT Ops Specialist,B,B</p>
+<p class="p1">44,Marion,Doumeingts,"1 Oct, 2018",Design and Research,Product Designer,M,D</p>
+<p class="p1">57,Eleonore,Adrian,"1 Oct, 2018",Sales,Sales Crew Lead,E,A</p>
+<p class="p1">38,Laurane,Maitrel,"8 Oct, 2018",Product Management,Product Manager,L,M</p>
+<p class="p1">47,Julien,Chenat,"15 Oct, 2018",Design and Research,Product Designer,J,C</p>
+<p class="p1">60,Naïm,Smutz,"22 Oct, 2018",Care,Product Specialist,N,S</p>
+<p class="p1">45,Lucie,Leflour,"29 Oct, 2018",Sales,Sales Lead,L,L</p>
+<p class="p1">51,Chloe,Legrand,"12 Nov, 2018",Care,Care Ops,C,L</p>
+<p class="p1">61,Mihaela,Albu,"12 Nov, 2018",Finance,Community Lead,M,A</p>
+<p class="p1">65,Berangere,Giraud,"21 Nov, 2018",Care,Customer Support Specialist - Entreprise,B,G</p>
+<p class="p1">55,Antoine,Moulet,"1 Dec, 2018",Product Management,Product Manager,A,M</p>
+<p class="p1">64,Augustin,Mine,"7 Jan, 2019",Market and Bet Owners,Community Lead,A,M</p>
+<p class="p1">58,Jean,Barloy,"14 Jan, 2019",Engineering,Software Engineer,J,B</p>
+<p class="p1">66,Thierry,Godfroid,"4 Feb, 2019",Engineering,Software Engineer,T,G</p>
+<p class="p1">77,Victor,Dancette,"1 Apr, 2019",Sales,Sales Crew Lead,V,D</p>
+<p class="p1">84,Claire,Lacroix,"1 Apr, 2019",Operations,Ops Coordinator,C,L</p>
+<p class="p1">83,Ariane,Bayat,"15 Apr, 2019",Sales,Sales Crew Lead,A,B</p>
+<p class="p1">70,Paulo,Gemelgo,"6 May, 2019",Insurance,Insurance Business,P,G</p>
+<p class="p1">86,Thomas,Mollard,"20 May, 2019",Engineering,Software Engineer,T,M</p>
+<p class="p1">102,Stephane,Soulier,"20 May, 2019",Data,Full Stack Data Scientist,S,S</p>
+<p class="p1">82,Antoine,Jackson,"17 Jun, 2019",Engineering,Software Engineer,A,J</p>
+<p class="p1">97,Flavie,de The,"17 Jun, 2019",Data,Full Stack Data Scientist,F,d</p>
+<p class="p1">87,Remi,Schockmel,"1 Jul, 2019",Sales,Sales Crew Lead,R,S</p>
+<p class="p1">94,Guillaume,Nevoux,"1 Jul, 2019",IT,IT Ops Specialist,G,N</p>
+<p class="p1">100,Remy-Christophe,Schermesser,"1 Jul, 2019",Engineering,Engineering Unit Referent,R,S</p>
+<p class="p1">112,Charles,Dusser,"1 Jul, 2019",Business Strategy and Operations,Community Lead,C,D</p>
+<p class="p1">99,Simon,Perre,"15 Jul, 2019",Operations,Ops Builder,S,P</p>
+<p class="p1">123,Clemence,Collon,"19 Aug, 2019",Operations,Ops Coordinator,C,C</p>
+<p class="p1">131,Fanette,Lopez,"19 Aug, 2019",Care,Knowledge Specialist,F,L</p>
+<p class="p1">117,Thomas,Repichet,"2 Sep, 2019",Sales,Sales Crew Lead,T,R</p>
+<p class="p1">120,Pierre-Yves,Caneill,"2 Sep, 2019",Engineering,Software Engineer,P,C</p>
+<p class="p1">116,Lorraine,Pipart,"16 Sep, 2019",Operations,Ops Coordinator,L,P</p>
+<p class="p1">128,Alexandre,Gerlic,"16 Sep, 2019",Engineering,Community Lead,A,G</p>
+<p class="p1">114,Clement,Sixdenier,"7 Oct, 2019",Sales,Account Manager,C,S</p>
+<p class="p1">121,David,Merckle,"7 Oct, 2019",Engineering,Engineering Unit Referent,D,M</p>
+<p class="p1">132,Manon,Trabuc,"7 Oct, 2019",People,People Ops,M,T</p>
+<p class="p1">143,Florian,Gagnadre,"7 Oct, 2019",Engineering,Software Engineer,F,G</p>
+<p class="p1">149,Lucie,Paladino,"7 Oct, 2019",Workplace,Community Lead,L,P</p>
+<p class="p1">134,Vincent,Perrot,"21 Oct, 2019",Operations,Ops Coordinator,V,P</p>
+<p class="p1">154,Maxence,Bouret,"21 Oct, 2019",Engineering,Software Engineer,M,B</p>
+<p class="p1">122,Lucie,Touchais,"4 Nov, 2019",People,People Growth,L,T</p>
+<p class="p1">137,Heloïse,Poras,"4 Nov, 2019",Operations,Ops Coordinator,H,P</p>
+<p class="p1">155,Sophie,Bussieres Cauberghs,"4 Nov, 2019",Operations,Community Lead,S,B</p>
+<p class="p1">141,Julie,Rossi,"18 Nov, 2019",Engineering,Software Engineer,J,R</p>
+<p class="p1">152,Ludovic,Bauple,"20 Nov, 2019",Sales,Revenue Lead,L,B</p>
+<p class="p1">138,Caroline,Carre,"2 Dec, 2019",Care,Care Crew Lead,C,C</p>
+<p class="p1">159,Juliette,Raimbault,"2 Dec, 2019",People,Community Lead,J,R</p>
+<p class="p1">163,Maryline,Lefebvre,"16 Dec, 2019",Operations,Ops Coordinator,M,L</p>
+<p class="p1">168,Laure,Bonnefoi,"16 Dec, 2019",Care,Product Specialist,L,B</p>
+<p class="p1">178,Lea,Vallerian,"16 Dec, 2019",Operations,Ops Coordinator,L,V</p>
+<p class="p1">145,Ujala,Anis,"20 Jan, 2020",Design and Research,Community Lead,U,A</p>
+<p class="p1">166,Caroline,Boudard,"3 Feb, 2020",Care,Product Specialist,C,B</p>
+<p class="p1">181,Thomas,Dudouet,"3 Feb, 2020",Engineering,Software Engineer,T,D</p>
+<p class="p1">179,Anastasia,Melnichenko,"17 Feb, 2020",Design and Research,Product Designer,A,M</p>
+<p class="p1">172,Marc,Faget,"2 Mar, 2020",Finance,Finance,M,F</p>
+<p class="p1">201,Romain,Stourm,"6 Apr, 2020",Sales,Sales Crew Lead,R,S</p>
+<p class="p1">204,Donatien,Laplace,"6 Apr, 2020",Sales,Account Executive,D,L</p>
+<p class="p1">216,Gregoire,Roussel,"6 Apr, 2020",Sales,Account Executive,G,R</p>
+<p class="p1">193,Maxime,Robinet,"4 May, 2020",Design and Research,Product Designer,M,R</p>
+<p class="p1">195,Emilie,Quellec,"4 May, 2020",Sales,Account Executive,E,Q</p>
+<p class="p1">196,Thomas,Porez,"4 May, 2020",Data,Full Stack Data Scientist,T,P</p>
+<p class="p1">197,Timna,Ehrmann,"4 May, 2020",Data,Full Stack Data Scientist,T,E</p>
+<p class="p1">221,Brecht,Verhamme,"4 May, 2020",Operations,Ops Builder,B,V</p>
+<p class="p1">223,Mohamed Ghazi,Benabid,"18 May, 2020",Business Strategy and Operations,Sales Strategist,M,B</p>
+<p class="p1">227,Marie-Helene,Stoltz,"18 May, 2020",Business Strategy and Operations,CRM manager,M,S</p>
+<p class="p1">236,Thibault,Devalle-Predieri,"18 May, 2020",Sales,Account Executive,T,D</p>
+<p class="p1">210,Mathieu,Ghaleb,"1 Jun, 2020",Engineering,Software Engineer,M,G</p>
+<p class="p1">237,Victor,Boutin,"1 Jun, 2020",Sales,Account Executive,V,B</p>
+<p class="p1">235,Laurent,Guerin,"15 Jun, 2020",Insurance,Community Lead,L,G</p>
+<p class="p1">242,Marion,Bergeret,"15 Jun, 2020",Corporate,Corporate Lead,M,B</p>
+<p class="p1">245,Simon,Verlaque,"15 Jun, 2020",Business Strategy and Operations,Sales Strategist,S,V</p>
+<p class="p1">247,Vincent,Poulain,"15 Jun, 2020",Engineering,Software Engineer,V,P</p>
+<p class="p1">230,Thomas,Quinot,"6 Jul, 2020",Corporate,Information security lead / CISO,T,Q</p>
+<p class="p1">249,Estelle,Pasteau,"20 Jul, 2020",Talent,Talent,E,P</p>
+<p class="p1">258,Tristan,du Boys,"20 Jul, 2020",Operations,Ops Coordinator,T,d</p>
+<p class="p1">234,Theo,Sermet,"17 Aug, 2020",Insurance,Insurance Products,T,S</p>
+<p class="p1">248,Sebastien,de Larquier,"17 Aug, 2020",Data,Community Lead,S,d</p>
+<p class="p1">240,Aurelie,Fliedel,"31 Aug, 2020",Marketing,Community Lead,A,F</p>
+<p class="p1">257,David,Rousselie,"31 Aug, 2020",Engineering,Software Engineer,D,R</p>
+<p class="p1">261,Alfredo,Schoch,"31 Aug, 2020",Operations,Ops Builder,A,S</p>
+<p class="p1">259,Sebastien,Fredeau,"14 Sep, 2020",Market and Bet Owners,Unit Lead - Belgium,S,F</p>
+<p class="p1">251,Josephine,Gaillet,"28 Sep, 2020",Care,Care Ops,J,G</p>
+<p class="p1">254,Dries,Stevens,"28 Sep, 2020",Sales,Sales Lead,D,S</p>
+<p class="p1">255,Nicolas,Zermati,"26 Oct, 2020",Engineering,Software Engineer,N,Z</p>
+<p class="p1">164,Lea,Vaude,"3 Sep, 2024",Sales,Customer Success Manager,L,V`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Fonction pour télécharger un fichier CSV</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function triggerUserFileDownload(options) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const { content, filename } = options;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const blob = new Blob([content], { type: 'text/csv' });</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const url = URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const a = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.download = filename;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.appendChild(a);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.click();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.removeChild(a);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>URL.revokeObjectURL(url);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Fonction de calcul de la distance de Levenshtein (mesure de similarité entre deux chaînes)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function levenshteinDistance(a, b) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const matrix = [];</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Incrémente</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function increment(i, j) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return matrix[i][j] + 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Insertion</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function insertion(i, j) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return matrix[i][j - 1] + 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Substitution</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function substitution(i, j) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return matrix[i - 1][j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Initialisation de la matrice</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt;= a.length; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>matrix[i] = [i];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let j = 1; j &lt;= b.length; j++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>matrix[0][j] = j;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Remplissage de la matrice</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 1; i &lt;= a.length; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let j = 1; j &lt;= b.length; j++) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>matrix[i][j] = Math.min(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>increment(i - 1, j), <span class="Apple-converted-space">    </span>// suppression</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>insertion(i, j), <span class="Apple-converted-space">        </span>// insertion</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>substitution(i, j) <span class="Apple-converted-space">      </span>// substitution</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return matrix[a.length][b.length];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Calcule la similarité entre deux chaînes (entre 0 et 1)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function calculateSimilarity(str1, str2) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const maxLength = Math.max(str1.length, str2.length);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (maxLength === 0) return 1.0; // Si les deux chaînes sont vides, elles sont identiques</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const distance = levenshteinDistance(str1, str2);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return 1.0 - distance / maxLength;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Composant principal</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function App() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [employes, setEmployes] = useState([]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [employesCharges, setEmployesCharges] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [recherche, setRecherche] = useState("");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [message, setMessage] = useState("");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [stats, setStats] = useState({ total: 0, decouverts: 0, score: 0 });</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [indicesActives, setIndicesActives] = useState({</p>
+<p class="p1"><span class="Apple-converted-space">                </span>communaute: false,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>role: false,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>initiales: false</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Seuil de similarité pour la correspondance approximative (0.8 = 80% de similarité)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [seuilSimilarite, setSeuilSimilarite] = useState(0.8);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// États pour le timer</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [jeuCommence, setJeuCommence] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [tempsRestant, setTempsRestant] = useState(3600); // 1 heure en secondes</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [jeuTermine, setJeuTermine] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const timerRef = useRef(null);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Référence pour maintenir la position de défilement</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const scrollPositionRef = useRef(0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Charger les données au démarrage</p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Parser le CSV</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Papa.parse(donneesBrutes, {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>header: true,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>skipEmptyLines: true,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>complete: function(results) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Transformer les données</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const donnees = results.data.map(function(employe) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>id: employe.employee_id,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>prenom: employe.first_name,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>nom: employe.last_name,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>dateDebut: employe.original_start_date,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>communaute: employe.community,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>role: employe.role,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>initialePrenom: employe.first_initial,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>initialeNom: employe.last_initial,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>longueurNom: employe.last_name.length,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>decouvert: false</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Trier les employés par ID</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>donnees.sort(function(a, b) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return parseInt(a.id) - parseInt(b.id);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setEmployes(donnees);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setStats({ total: donnees.length, decouverts: 0, score: 0 });</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setEmployesCharges(true);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Gestion du timer</p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (jeuCommence &amp;&amp; !jeuTermine) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>timerRef.current = setInterval(function() {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setTempsRestant(function(prev) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>if (prev &lt;= 1) {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>clearInterval(timerRef.current);</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>setJeuTermine(true);</p>
+<p class="p2"><span class="Apple-converted-space">                                </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>// Révéler toutes les réponses quand le temps est écoulé</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>setEmployes(function(prevEmployes) {</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>return prevEmployes.map(function(employe) {</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>...employe,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>decouvert: true</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                                </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>return 0;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return prev - 1;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}, 1000);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>return function() {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (timerRef.current) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>clearInterval(timerRef.current);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, [jeuCommence, jeuTermine]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Commencer le jeu</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function commencerJeu() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setJeuCommence(true);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTempsRestant(3600); // 1 heure</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setJeuTermine(false);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Réinitialiser les employés découverts</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setEmployes(function(prevEmployes) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return prevEmployes.map(function(employe) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>...employe,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>decouvert: false</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setStats(function(prev) {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return { ...prev, decouverts: 0, score: 0 };</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Formater le temps restant</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function formaterTemps(secondes) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const minutes = Math.floor(secondes / 60);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const secondesRestantes = secondes % 60;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return `${minutes.toString().padStart(2, '0')}:${secondesRestantes.toString().padStart(2, '0')}`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Trouver le meilleur match pour un nom recherché</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function trouverMeilleurMatch(nomRecherche) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let meilleurMatch = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let meilleureSimilarite = 0;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>employes.forEach(function(employe) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (!employe.decouvert) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const similarite = calculateSimilarity(</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>nomRecherche.toLowerCase(),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>employe.nom.toLowerCase()</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>);</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (similarite &gt; meilleureSimilarite &amp;&amp; similarite &gt;= seuilSimilarite) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>meilleureSimilarite = similarite;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>meilleurMatch = employe;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>return { employe: meilleurMatch, similarite: meilleureSimilarite };</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Gérer la soumission du formulaire sans défilement</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function verifierNom(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>e.preventDefault();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Sauvegarder la position de défilement actuelle</p>
+<p class="p1"><span class="Apple-converted-space">                </span>scrollPositionRef.current = window.scrollY;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!jeuCommence || jeuTermine) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setMessage(jeuTermine ? "Le temps est écoulé ! Toutes les réponses sont révélées. Cliquez sur 'Recommencer' pour jouer à nouveau." : "Cliquez sur 'Commencer' pour démarrer le jeu.");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!recherche.trim()) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setMessage("Veuillez entrer un nom");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const nomRecherche = recherche.trim().toLowerCase();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Vérifier si le nom est exactement le même</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const employeExact = employes.find(</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>function(e) { return e.nom.toLowerCase() === nomRecherche &amp;&amp; !e.decouvert; }</p>
+<p class="p1"><span class="Apple-converted-space">                </span>);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Si pas de correspondance exacte, chercher le meilleur match</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!employeExact) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const { employe: meilleurMatch, similarite } = trouverMeilleurMatch(nomRecherche);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (meilleurMatch) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Trouver un match approximatif</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>let pointsGagnes = 10; // Par défaut, 10 points sans indices</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Calculer les points en fonction des indices utilisés</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (indicesActives.communaute &amp;&amp; indicesActives.role &amp;&amp; indicesActives.initiales) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>pointsGagnes = 1; // 1 point avec tous les indices</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>} else if ((indicesActives.communaute &amp;&amp; indicesActives.role) ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>(indicesActives.communaute &amp;&amp; indicesActives.initiales) ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>(indicesActives.role &amp;&amp; indicesActives.initiales)) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>pointsGagnes = 3; // 3 points avec deux indices</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>} else if (indicesActives.communaute || indicesActives.role || indicesActives.initiales) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>pointsGagnes = 5; // 5 points avec un seul indice</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Réduire légèrement les points pour les correspondances approximatives</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>pointsGagnes = Math.round(pointsGagnes * similarite);</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setStats(function(prev) {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>...prev,<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>decouverts: prev.decouverts + 1,</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>score: prev.score + pointsGagnes</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Mettre à jour l'employé comme découvert</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setEmployes(function(prev) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return prev.map(function(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>return e.nom === meilleurMatch.nom ? { ...e, decouvert: true } : e;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setMessage(`Bravo ! Vous avez trouvé un employé avec un nom similaire : "${meilleurMatch.prenom} ${meilleurMatch.nom}" (${Math.round(similarite * 100)}% de similarité). +${pointsGagnes} points !`);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setRecherche("");</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Restaurer la position de défilement après le rendu</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setTimeout(function() {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>window.scrollTo(0, scrollPositionRef.current);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}, 0);</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Vérifier si l'employé a déjà été découvert</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const employeDejaDecouvert = employes.find(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>function(e) { return e.nom.toLowerCase() === nomRecherche &amp;&amp; e.decouvert; }</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (employeDejaDecouvert) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setMessage(`Vous avez déjà découvert ${employeDejaDecouvert.prenom} ${employeDejaDecouvert.nom}.`);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setMessage(`Aucun employé trouvé avec le nom "${recherche}".`);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setRecherche("");</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Restaurer la position de défilement après le rendu</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setTimeout(function() {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>window.scrollTo(0, scrollPositionRef.current);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}, 0);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Correspondance exacte trouvée</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let pointsGagnes = 10; // Par défaut, 10 points sans indices</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Calculer les points en fonction des indices utilisés</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (indicesActives.communaute &amp;&amp; indicesActives.role &amp;&amp; indicesActives.initiales) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>pointsGagnes = 1; // 1 point avec tous les indices</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else if ((indicesActives.communaute &amp;&amp; indicesActives.role) ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>(indicesActives.communaute &amp;&amp; indicesActives.initiales) ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>(indicesActives.role &amp;&amp; indicesActives.initiales)) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>pointsGagnes = 3; // 3 points avec deux indices</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else if (indicesActives.communaute || indicesActives.role || indicesActives.initiales) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>pointsGagnes = 5; // 5 points avec un seul indice</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setStats(function(prev) {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>...prev,<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>decouverts: prev.decouverts + 1,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>score: prev.score + pointsGagnes</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Mettre à jour l'employé comme découvert</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setEmployes(function(prev) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return prev.map(function(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return e === employeExact ? { ...e, decouvert: true } : e;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setMessage(`Bravo ! Vous avez trouvé ${employeExact.prenom} ${employeExact.nom}. +${pointsGagnes} points !`);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setRecherche("");</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Restaurer la position de défilement après le rendu</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(function() {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>window.scrollTo(0, scrollPositionRef.current);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Activer/désactiver les indices</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function toggleIndice(indice) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!jeuCommence || jeuTermine) return;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setIndicesActives(function(prev) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const newState = { ...prev };</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>newState[indice] = !prev[indice];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return newState;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Réinitialiser le jeu</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function reinitialiser() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (timerRef.current) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>clearInterval(timerRef.current);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setEmployes(employes.map(function(e) { return { ...e, decouvert: false }; }));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setStats({ total: employes.length, decouverts: 0, score: 0 });</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setIndicesActives({ communaute: false, role: false, initiales: false });</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setJeuCommence(false);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setJeuTermine(false);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTempsRestant(3600);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setMessage("Jeu réinitialisé !");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Exporter les données sous format CSV</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function exporterCSV() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const header = "employee_id,first_name,last_name,original_start_date,community,role,first_initial,last_initial\n";</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const lignes = employes.map(function(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return `${e.id},${e.prenom},${e.nom},${e.dateDebut},${e.communaute},${e.role},${e.initialePrenom},${e.initialeNom}`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}).join("\n");</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const contenu = header + lignes;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>triggerUserFileDownload({</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>content: contenu,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>filename: "100_premiers_alaniens.csv"</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Modifier le seuil de similarité</p>
+<p class="p1"><span class="Apple-converted-space">            </span>function changerSeuilSimilarite(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setSeuilSimilarite(parseFloat(e.target.value));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Afficher un message de chargement si les données ne sont pas encore chargées</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!employesCharges) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>"div",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ style: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' } },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{ style: { fontSize: '1.25rem', color: '#4b5563' } },</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"Chargement des données..."</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Le reste du rendu avec React.createElement au lieu de JSX</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>maxWidth: '800px',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>margin: '0 auto',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>padding: '20px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontFamily: 'Arial, sans-serif'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Titre</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"h1",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "title",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>fontSize: '2.5rem',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>fontWeight: 'bold',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>marginBottom: '1.5rem',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>textAlign: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>color: 'black'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"Les 100 premiers Alaniens"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Instructions</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "instructions",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>marginBottom: '1.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>padding: '1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: '#f0f9ff',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"h2",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: { fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"Comment jouer :"</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"ol",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { paddingLeft: '1.5rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("li", { key: "instr1" }, "Devinez le nom de famille d'un des 100 premiers employés d'Alan"),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("li", { key: "instr2" }, [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>React.createElement("strong", null, "10 points"),</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>" par nom trouvé sans indice"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>]),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("li", { key: "instr3" }, [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"Utilisez les boutons d'indices pour vous aider :",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>"ul",</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>{ style: { paddingLeft: '1.5rem', marginTop: '0.25rem', listStyleType: 'circle' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>React.createElement("li", { key: "hint1" }, [</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>"Avec 1 indice : ",</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>React.createElement("strong", null, "5 points"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>" par nom trouvé"</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>]),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>React.createElement("li", { key: "hint2" }, [</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>"Avec 2 indices : ",</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>React.createElement("strong", null, "3 points"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>" par nom trouvé"</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>]),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>React.createElement("li", { key: "hint3" }, [</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>"Avec 3 indices : ",</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>React.createElement("strong", null, "1 point"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>" par nom trouvé"</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>])</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>]),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("li", { key: "instr4" }, "Les orthographes approximatives sont acceptées"),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("li", { key: "instr5" }, [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"Vous avez ",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>React.createElement("strong", null, "1 heure"),</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>" pour trouver un maximum de noms !"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>])</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                            </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>!jeuCommence &amp;&amp; !jeuTermine ? React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { textAlign: 'center', marginTop: '1rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>onClick: commencerJeu,</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>backgroundColor: '#3b82f6',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>padding: '0.75rem 1.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>fontWeight: 'bold',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>fontSize: '1.125rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>"Commencer"</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>) : null</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Timer</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "timer",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>marginBottom: '1.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>padding: '0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: jeuTermine ? '#fee2e2' : '#f0f9ff',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>justifyContent: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>alignItems: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>gap: '1rem'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>fontSize: '2rem',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>fontWeight: 'bold',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>color: jeuTermine ? '#b91c1c' : (tempsRestant &lt; 300 ? '#b91c1c' : '#1e40af')</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>formaterTemps(tempsRestant)</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                            </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>jeuCommence ? React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>fontSize: '1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>color: jeuTermine ? '#b91c1c' : 'inherit'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>jeuTermine ? "Temps écoulé !" : "Temps restant"</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>) : null</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Formulaire de recherche</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "search-form",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>marginBottom: '1.5rem',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>position: 'sticky',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>top: '0',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>zIndex: '10',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: 'white',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>padding: '10px 0'<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"form",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>onSubmit: verifierNom,</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: { display: 'flex', gap: '0.5rem' }</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"input",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type: "text",</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>value: recherche,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onChange: function(e) { setRecherche(e.target.value); },</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>placeholder: "Entrez un nom de famille...",</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>disabled: !jeuCommence || jeuTermine,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>flex: '1',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: '1px solid #d1d5db',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type: "submit",</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>disabled: !jeuCommence || jeuTermine,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>backgroundColor: '#3b82f6',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.5rem 1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"Vérifier"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                            </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>message ? React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>marginTop: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>padding: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>backgroundColor: message.includes('Bravo') ? '#dcfce7' : '#f3f4f6',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>color: message.includes('Bravo') ? '#166534' : 'inherit'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>message</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>) : null</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Statistiques et contrôles</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "stats-controls",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>marginBottom: '1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>padding: '0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: '#f9fafb',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>flexWrap: 'wrap',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>justifyContent: 'space-between',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>alignItems: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>gap: '0.75rem'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Statistiques</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { fontWeight: '500' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>null,</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>`Progrès : ${stats.decouverts} / ${stats.total} employés découverts`</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ style: { fontSize: '1.125rem', fontWeight: '700' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>`Score : ${stats.score} points`</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                            </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Boutons d'indices</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// Indice : Communauté</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onClick: function() { toggleIndice('communaute'); },</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>disabled: !jeuCommence || jeuTermine,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.25rem 0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>backgroundColor: indicesActives.communaute ? '#fef9c3' : '#e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>color: indicesActives.communaute ? '#854d0e' : 'inherit',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>indicesActives.communaute ? 'Masquer communauté' : 'Indice : Communauté'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// Indice : Rôle</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onClick: function() { toggleIndice('role'); },</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>disabled: !jeuCommence || jeuTermine,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.25rem 0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>backgroundColor: indicesActives.role ? '#fef9c3' : '#e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>color: indicesActives.role ? '#854d0e' : 'inherit',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>indicesActives.role ? 'Masquer rôle' : 'Indice : Rôle'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// Indice : Initiales</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onClick: function() { toggleIndice('initiales'); },</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>disabled: !jeuCommence || jeuTermine,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.25rem 0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>backgroundColor: indicesActives.initiales ? '#fef9c3' : '#e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>color: indicesActives.initiales ? '#854d0e' : 'inherit',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>indicesActives.initiales ? 'Masquer initiales' : 'Indice : Initiales'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                            </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Contrôles (boutons)</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// Bouton réinitialiser/recommencer</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onClick: reinitialiser,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>backgroundColor: '#e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.25rem 0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>cursor: 'pointer'</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>jeuTermine ? "Recommencer" : "Réinitialiser"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// Bouton exporter CSV</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onClick: exporterCSV,</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>backgroundColor: '#22c55e',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>padding: '0.25rem 0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>cursor: 'pointer'</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"Exporter CSV"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Réglage de la sensibilité</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "sensitivity",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>marginBottom: '1.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>padding: '0.75rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: '#f0f9ff',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { marginBottom: '0.5rem', fontWeight: '500' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>`Sensibilité de correspondance : ${Math.round(seuilSimilarite * 100)}%`</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"input",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>type: "range",</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>min: "0.5",</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>max: "0.95",</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>step: "0.05",</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>value: seuilSimilarite,</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>onChange: changerSeuilSimilarite,</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: { width: '100%' }</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', color: '#6b7280' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("span", null, "Plus flexible"),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("span", null, "Plus strict")</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Liste des employés triée par ID</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "employee-list",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>border: '1px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>overflow: 'hidden',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: 'white'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Titre</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>backgroundColor: '#1f2937',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>fontWeight: 'bold',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>padding: '0.75rem'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>`Liste des employés (${employes.length})`</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                            </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Tableau des employés</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"table",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { width: '100%', borderCollapse: 'collapse' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// En-tête du tableau</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"thead",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>null,</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>"tr",</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>{ style: { backgroundColor: 'rgba(243, 244, 246, 0.8)' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "ID"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Date début"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>indicesActives.communaute &amp;&amp; React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Communauté"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>indicesActives.role &amp;&amp; React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Rôle"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>indicesActives.initiales &amp;&amp; React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Initiales"),</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Nom complet")</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>].filter(Boolean) // Filtre les éléments null</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>// Corps du tableau</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>"tbody",</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>null,</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>employes.map(function(employe, idx) {</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>return React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>"tr",</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>key: idx,</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>style: {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>backgroundColor: idx % 2 === 0 ? 'white' : 'rgba(249, 250, 251, 0.8)'</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>React.createElement("td", { style: { padding: '0.5rem' } }, employe.id),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>React.createElement("td", { style: { padding: '0.5rem' } }, employe.dateDebut),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>indicesActives.communaute &amp;&amp; React.createElement("td", { style: { padding: '0.5rem' } }, employe.communaute),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>indicesActives.role &amp;&amp; React.createElement("td", { style: { padding: '0.5rem' } }, employe.role),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>indicesActives.initiales &amp;&amp; React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>"td",</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>{ style: { padding: '0.5rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>`${employe.initialePrenom}. ${employe.initialeNom}.`</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>"td",</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>{ style: { padding: '0.5rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>employe.decouvert<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>? React.createElement("span", { style: { fontWeight: '500' } }, `${employe.prenom} ${employe.nom}`)</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>: React.createElement("span", { style: { color: '#9ca3af' } }, "● ●")</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>].filter(Boolean) // Filtre les éléments null</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>),</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Message de fin de jeu</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>jeuTermine &amp;&amp; React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>"div",</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>key: "game-over",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>margin: '20px 0',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>padding: '1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: '#fee2e2',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '0.5rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>textAlign: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"h2",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { fontSize: '1.5rem', fontWeight: 'bold', color: '#b91c1c' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"Temps écoulé !"</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"p",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { marginTop: '0.5rem' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>[</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>"Vous avez trouvé ",</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("strong", null, stats.decouverts),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>` employés sur ${stats.total} et marqué `,</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>React.createElement("strong", null, stats.score),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>" points."</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"p",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ style: { marginTop: '0.5rem', fontStyle: 'italic' } },</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"Toutes les réponses ont été révélées. Vous pouvez explorer la liste complète."</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>React.createElement(</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"button",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>onClick: reinitialiser,</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>style: {</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>marginTop: '1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>backgroundColor: '#3b82f6',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>padding: '0.5rem 1rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>borderRadius: '0.375rem',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>fontWeight: 'bold',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>cursor: 'pointer'</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>"Rejouer"</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>]</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Rendu de l'application</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ReactDOM.render(React.createElement(App), document.getElementById('root'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
