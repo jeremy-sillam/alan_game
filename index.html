@@ -1,1663 +1,2241 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="fr">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Do you really know your fellow Alaners?</title>
+
+    <title>Les 100 premiers Alaners </title>
+
     
-    <!-- Include React (production version) -->
+
+    <!-- Inclure React (version production) -->
+
     <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+
     
-    <!-- Include PapaParse for CSV processing -->
+
+    <!-- Inclure PapaParse pour le traitement CSV -->
+
     <script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"></script>
+
     
-    <!-- Social sharing metadata -->
-    <meta property="og:title" content="Do you really know your fellow Alaners?">
-    <meta property="og:description" content="Guess game about Alan employees">
+
+    <!-- Métadonnées pour le partage social -->
+
+    <meta property="og:title" content="Les 100 premiers Alaners">
+
+    <meta property="og:description" content="Jeu de devinettes sur les employés d'Alan">
+
     <meta property="og:type" content="website">
+
     
+
     <style>
+
         body {
+
             font-family: Arial, sans-serif;
+
             margin: 0;
+
             padding: 0;
+
             background-color: #f9fafb;
+
         }
+
         #root {
+
             margin: 0 auto;
+
         }
+
     </style>
+
 </head>
+
 <body>
+
     <div id="root"></div>
+
     
-    <!-- Game code -->
+
+    <!-- Le code du jeu -->
+
     <script>
-        // Destructure necessary React elements
+
+        // Destructurer les éléments React nécessaires
+
         const { useState, useEffect, useRef } = React;
-// Données complètes des employés
-const donneesBrutes = `FIRST_NAME,LAST_NAME,START_DATE,COMMUNITY,ROLE,SCOPE,"LEFT(FIRST_NAME,1)","LEFT(LAST_NAME,1)"
-Evan,Azoulay,"22 Apr, 2025",Data,Data (Intern),Global,E,A
-Younes,Souffi,"13 Jan, 2025",Marketing,Growth Marketing,Global,Y,S
-Léo,Champion,"19 Jun, 2023",Engineering,Software Engineer,Global,L,C
-Antoine,Moulet,"1 Dec, 2018",Product Management,Product Manager,Global,A,M
-Maxence,Bouret,"21 Oct, 2019",Engineering,Software Engineer,Global,M,B
-Elodie,Burtin,"23 Oct, 2023",Engineering,Software Engineer,Global,E,B
-Lauriane,Tanchou,"16 Oct, 2024",Health practitioners,Optician,Global,L,T
-Julien,Plessis,"4 Jul, 2022",Sales,Account Executive,France,J,P
-Juanjo,Domínguez,"2 Dec, 2024",Sales,Sales Lead,Global,J,D
-Thomas,Bosson,"3 Jun, 2024",Marketing,Field Marketing,Global,T,B
-Hippolyte,Hazard,"18 Dec, 2023",Operations,Ops Builder,Global,H,H
-Beatriz,Rubio,"23 Oct, 2023",Design and Research,Product Designer,Global,B,R
-Thomas,Quinot,"6 Jul, 2020",Corporate,Information security lead / CISO,Global,T,Q
-Julie,Rossi,"18 Nov, 2019",Engineering,Software Engineer,Global,J,R
-Lea,Vallerian,"16 Dec, 2019",Operations,Ops Coordinator,France,L,V
-Jeremy,Sillam,"1 Mar, 2023",Data,Full Stack Data Scientist,Global,J,S
-Olivier,Sambourg,"6 Jun, 2017",Engineering,Software Engineer,Global,O,S
-Sara,Tezenas du Montcel,"24 Feb, 2025",Operations,Ops Coordinator,Global,S,T
-Thibault,Goustat,"23 May, 2022",Operations,Ops Builder,Global,T,G
-Rodrigo,Tico,"18 Jul, 2022",Sales,Account Executive,Spain,R,T
-Audrey,Brimbeuf,"7 Oct, 2024",Sales,Account Manager,France,A,B
-Leslie,Artus,"23 Oct, 2023",Care,User Care Expert,France,L,A
-Juan,Escamilla,"2 Dec, 2024",Sales,Account Executive,Spain,J,E
-Marion,Bechetoille,"18 Nov, 2024",Care,Outsourcing Delivery Specialist,France,M,B
-Ros
-Guillaume,Bessalem,"5 Jul, 2021",Insurance,Insurance Products,France,G,B
-Alexandre,Renault,"3 Jan, 2022",Care,User Care Expert,France,A,R
-Sarah,Decoster,"19 Oct, 2020",Operations,Ops Coordinator,Belgium,S,D
-Jasper,Beirens,"15 May, 2023",Finance,Finance,Global,J,B
-Myriam,Girin,"22 Apr, 2025",Sales,Account Executive,France,M,G
-Théodore,Philipp,"25 Mar, 2024",Sales,Account Executive,France,T,P
-Florian,Gagnadre,"7 Oct, 2019",Engineering,Software Engineer,Global,F,G
-Carlos,Arroyo Macarro,"31 Jul, 2023",Care,User Care Expert,Spain,C,A
-Pau,Palacios Vilajuana,"2 Jan, 2024",Care,Care Crew Lead,Spain,P,P
-Maria Monica,Mendoza Arevalo,"15 Jan, 2024",Sales,Business Development Representative,Spain,M,M
-Emma,Goldblum,"1 Feb, 2021",Engineering,Software Engineer,Global,E,G
-Quentin,Planes,"12 Feb, 2024",Sales,Inbound Sales,France,Q,P
-Racim,Amer Moussa,"6 Jan, 2025",Care,Care Ops,France,R,A
-Magdeleine,Courtois,"16 Jun, 2025",Associates,Founder Associate,Global,M,C
-Yoann,Artus,"12 Aug, 2024",Market and Bet Owners,Unit Lead - Spain,Spain,Y,A
-Vincent,Lambert,"12 Sep, 2022",Operations,Ops Builder,Global,V,L
-Miguel Jesús,García Vázquez,"13 Mar, 2023",Sales,Account Executive,Spain,M,G
-Lea,Vaude,"3 Sep, 2024",Sales,Customer Success Manager,France,L,V
-Gisèle,Seif,"22 Apr, 2025",Care,Outsourcing Delivery Specialist,Global,G,S
-Anaël,Beaugnon,"6 May, 2024",Data,Full Stack Data Scientist,Global,A,B
-Tomas Karin P,Van Zundert,"3 Jan, 2023",Operations,Ops Coordinator,Belgium,T,V
-Georges,Namet,"1 Feb, 2021",Engineering,Software Engineer,Global,G,N
-Aboubakr,Mouline,"10 Feb, 2025",Insurance,Insurance Products,France,A,M
-Benjamin,Dentaud,"21 Jun, 2021",Sales,Account Executive,France,B,D
-Antoine,Destombes,"23 Oct, 2023",Care,User Care Expert,France,A,D
-Azzedine,Daoud,"7 Apr, 2025",Sales,Business Development Representative,France,A,D
-Nikolaos,Metaxas,"31 Mar, 2025",Sales,Account Executive,Global,N,M
-Vincent,Hirsch,"15 Mar, 2021",Public Affairs,Community Lead,Global,V,H
-Maï-thi,Van Cong Trang,"29 Mar, 2021",Care,User Care Expert,France,M,V
-Rémy,Thirot,"21 May, 2024",Sales,Business Development Representative,France,R,T
-Cécile,Defline,"7 Apr, 2025",Sales,Account Executive,France,C,D
-Francesco,Pontrandolfo,"4 Dec, 2023",Product Management,Community Associate,Global,F,P
-Constance,Protais,"25 Sep, 2023",Care,User Care Expert,France,C,P
-Lola,Lecasble,"22 Nov, 2021",Design and Research,User Researcher,Global,L,L
-Ivan,Shestunov,"8 Nov, 2021",Design and Research,Product Designer,Global,I,S
-Marta,Martín Mazaira,"16 Aug, 2023",Health practitioners,Health Practitioner,Spain,M,M
-Victoria,Lainé,"25 Sep, 2023",Marketing,Marketing Acquisition,Global,V,L
-Antoine,Lizee,"9 May, 2016",Data,Full Stack Data Scientist,Global,A,L
-Lieven,Jacquot,"24 Feb, 2025",Engineering,Software Engineer,Global,L,J
-Julien,Chenat,"15 Oct, 2018",Design and Research,Product Designer,Global,J,C
-Alice,Borrego,"12 Aug, 2024",Care,User Care Expert,Spain,A,B
-Anaïs,Persigan,"14 Mar, 2022",Sales,Customer Success Manager,France,A,P
-Aleksandra,Orłowska,"15 Jul, 2024",Talent,Talent,Global,A,O
-Vincent,Brachet,"9 Apr, 2018",Sales,Sales Crew Lead,France,V,B
-Adrien,Sarg,"1 Jul, 2024",Associates,Founder Associate,Global,A,S
-Donatien,Laplace,"6 Apr, 2020",Sales,Account Executive,France,D,L
-Emma,Kleiber,"11 Oct, 2021",Care,Care Crew Lead,France,E,K
-Julie,Pouzols,"28 Mar, 2022",Operations,Ops Builder,Global,J,P
-Mario,Le Bras,"10 Mar, 2025",Marketing,Field Marketing,France,M,L
-Antonin,Changeon,"31 Jul, 2023",Care,User Care Expert,France,A,C
-Hortense,Villeronce,"6 Dec, 2021",Design and Research,User Researcher,Global,H,V
-Nordwin,Hoff,"28 Mar, 2022",Engineering,Software Engineer,Global,N,H
-Estelle,Berdugo,"10 Feb, 2025",Sales,Account Executive,France,E,B
-Steven,Godard,"10 Oct, 2022",Product Management,Product Manager,Global,S,G
-Thibault,Devalle-Predieri,"18 May, 2020",Sales,Account Executive,France,T,D
-Nina,Bliah-Gil,"15 Jul, 2024",Workplace,Workplace Experience,Global,N,B
-Arthur,Raffegeau,"10 Feb, 2025",Insurance,Insurance Products,France,A,R
-Léo,Darriet,"10 Mar, 2025",Design and Research,Product Designer,Global,L,D
-Léa,Lacoste,"2 Dec, 2024",Engineering,Software Engineer,Global,L,L
-Margot,Vanfleteren,"22 Nov, 2021",Care,User Care Expert,Belgium,M,V
-Kevin,Delvecchio,"7 Oct, 2024",Marketing,Brand and Content,Global,K,D
-Ketsia,Mukuna,"7 Oct, 2024",Sales,Inbound Sales,France,K,M
-Guillaume,Bizot,"15 Jan, 2024",Sales,Account Executive,France,G,B
-Céline,Tabary Kern,"11 Sep, 2023",Care,User Care Expert,France,C,T
-Jordan,Kowal,"19 May, 2025",Engineering,Software Engineer,Global,J,K
-Remy-Christophe,Schermesser,"1 Jul, 2019",Engineering,Engineering Unit Referent,Global,R,S
-Pauline,Bouchereau,"22 Apr, 2024",Engineering,Software Engineer,Global,P,B
-Julien,Femia,"13 Feb, 2023",Engineering,Software Engineer,Global,J,F
-Léa,Frehel,"6 Jan, 2025",Sales,Business Development Representative,France,L,F
-Maryline,Gnonlonfoun,"2 Aug, 2021",Care,Customer Support Specialist - Public Sector,France,M,G
-Frederik,Lundqvist,"3 Jan, 2023",Sales,Account Executive,Belgium,F,L
-Eleonore,Adrian,"1 Oct, 2018",Sales,Sales Crew Lead,France,E,A
-Odile,Kusnik,"28 Sep, 2020",Insurance,Insurance Products,Canada,O,K
-Antoine,Bertin,"31 Jan, 2022",Engineering,Software Engineer,Global,A,B
-Aurelien,Cazes,"1 Mar, 2021",Business Strategy and Operations,Sales Strategist,Belgium,A,C
-Loïc,Say,"10 Feb, 2025",Engineering,Software Engineer,Global,L,S
-Eric,Caginicolau,"29 Jan, 2024",Engineering,Software Engineer,Global,E,C
-Johannes,Weck,"24 Mar, 2025",Engineering,Software Engineer,Global,J,W
-Hortense,Drevon,"26 Aug, 2024",Sales,Customer Success Manager,France,H,D
-Chaïmaa,Kadaoui,"1 Mar, 2021",Corporate,Security Engineer,Global,C,K
-Anna,Keroulle,"26 Sep, 2022",Marketing,Brand and Content,Global,A,K
-William,Earp,"9 Nov, 2020",Engineering,Software Engineer,Global,W,E
-Cyril,Vinot,"3 Jul, 2018",Data,Full Stack Data Scientist,Global,C,V
-Valérie,Le Goc,"6 May, 2024",Marketing,Growth Marketing,Global,V,L
-Lucie,Paladino,"7 Oct, 2019",Workplace,Community Lead,Global,L,P
-Noemie,Duneton,"14 Sep, 2020",Associates,Unit Associate,Global,N,D
-Kristina,Rylova,"14 Mar, 2022",Marketing,Product Marketing,Global,K,R
-Thierry,Godfroid,"4 Feb, 2019",Engineering,Software Engineer,Global,T,G
-Louis,Pinget,"25 May, 2021",Care,User Care Expert,France,L,P
-Clothilde,Maurer,"7 Jun, 2021",Talent,Talent Ops,Global,C,M
-Jean Philippe,Aldon,"12 Apr, 2021",Sales,Account Executive,France,J,A
-Cécile,Plateaux,"7 Oct, 2024",Care,User Care Expert,France,C,P
-Cecile,Raque,"30 Aug, 2021",Sales,Tender Manager,France,C,R
-David,Barthelemy,"9 May, 2022",Engineering,Software Engineer,Global,D,B
-Francesca,Vogliotti,"3 Jan, 2023",Business Strategy and Operations,Sales Strategist,Global,F,V
-Celine,Brunel,"22 Nov, 2021",Design and Research,Product Designer,Global,C,B
-Victor,Dancette,"1 Apr, 2019",Sales,Sales Crew Lead,France,V,D
-Gregoire,Roussel,"6 Apr, 2020",Sales,Account Executive,France,G,R
-Jeremie,Preault,"30 Aug, 2021",Workplace,Workplace Experience,Global,J,P
-Romain,Stourm,"6 Apr, 2020",Sales,Sales Crew Lead,France,R,S
-Mickael,Eymauzy,"25 Apr, 2022",Sales,Account Executive,France,M,E
-Perrine,Pullicino,"28 Aug, 2023",Engineering,Software Engineer,Global,P,P
-Camille,Belmokadem,"2 Jan, 2024",Sales,Business Development Representative,France,C,B
-Isabel,Belmonte Alfaro,"7 Apr, 2025",Sales,Account Manager,Spain,I,B
-Thomas,Repichet,"2 Sep, 2019",Sales,Sales Crew Lead,France,T,R
-Jonathan,Kuek,"13 Jan, 2025",Engineering,Software Engineer,Global,J,K
-Gaspard,Le Hebel,"3 Jan, 2024",Associates,Community Associate,Global,G,L
-François-Regis,Sinot,"1 Feb, 2021",Engineering,Software Engineer,Global,F,S
-Rocio Florencia,Fariña Paredes,"11 Mar, 2024",Sales,Business Development Representative,Spain,R,F
-Edern,Poisson,"12 Feb, 2024",Operations,Ops Coordinator,Global,E,P
-Laura,Maes,"25 Mar, 2024",Sales,Sales Associate,Belgium,L,M
-Maxime,Robinet,"4 May, 2020",Design and Research,Product Designer,Global,M,R
-Jibril,Kechidi,"11 Apr, 2022",Sales,Account Executive,France,J,K
-Margot,Debure,"2 Aug, 2021",Care,Care Hiring Specialist,France,M,D
-Louis,Daisomont,"9 Sep, 2024",Engineering,Software Engineer,Global,L,D
-Marie,Humblet Vertongen,"25 Mar, 2024",Operations,Ops Builder,Global,M,H
-Stanislas,Larget-Piet,"16 Dec, 2024",Associates,Unit Associate,Global,S,L
-Alexis,Bertholon,"28 Feb, 2022",Talent,Talent,Global,A,B
-Vincent,Rialland,"27 Jan, 2025",Engineering,Software Engineer,Global,V,R
-Maxime,Le Bras,"7 Dec, 2020",Talent,Community Lead,Global,M,L
-Alexandre,Azria,"23 Jul, 2024",Design and Research,Community Associate,Global,A,A
-Hugo,de La Marlier de La Sauverie,"25 Mar, 2024",Insurance,Insurance Business,France,H,d
-Florian,Ernst,"3 Jan, 2022",Data,Full Stack Dataery Alejandra,Garcia Avendaño,"13 Feb, 2023",Care,User Care Expert,Spain,V,G
-Margaux,Forget,"11 Sep, 2023",Data,Full Stack Data Scientist,Global,M,F
-Xavier,Seignard,"7 Jun, 2021",Engineering,Software Engineer,Global,X,S
-Elodie,Erwitt,"15 Jul, 2024",Engineering,Software Engineer,Global,E,E
-Juan Pablo,Briceno,"7 Oct, 2024",Associates,Founder Associate,Global,J,B
-Moritz,Zilian,"7 Nov, 2022",Engineering,Software Engineer,Global,M,Z
-Lea,Barbaroux,"26 Oct, 2020",Sales,Sales Crew Lead,France,L,B
-Theo,Dammaretz,"15 Mar, 2021",Engineering,Software Engineer,Global,T,D
-Aymeric,Frys,"8 Apr, 2024",Sales,Business Development Representative,France,A,F
-Josephine,Gaillet,"28 Sep, 2020",Care,Care Ops,France,J,G
-Julie,Vertenten,"14 Mar, 2022",Sales,Account Executive,Belgium,J,V
-Brent,Carels,"24 Mar, 2025",Sales,Account Executive,Belgium,B,C
-Paloma,Albo Domene,"11 Mar, 2024",Operations,Ops Coordinator,Spain,P,A
-Robin,Rettien,"10 Feb, 2025",Engineering,Software Engineer,Global,R,R
-Andrea,Peftuloglu,"24 Apr, 2023",Care,User Care Expert,Global,A,P
-Diane,Teste,"5 Jun, 2023",Sales,Business Development Representative,France,D,T
-Anne-Claire,Ho Si,"6 Dec, 2021",Engineering,Software Engineer,Global,A,H
-Lucy,Lavielle,"27 Feb, 2023",Sales,Customer Success Manager,France,L,L
-Emmanuelle,Lacaille,"28 Feb, 2022",Sales,Account Executive,France,E,L
-Margaux,Macioce Lischewski,"16 Aug, 2022",Business Strategy and Operations,Business Segment Lead,Global,M,M
-Maria Luisa,Freitas Correia,"13 Sep, 2021",Operations,Ops Builder,Global,M,F
-Thanh Van Laura,Tran Binh,"13 Mar, 2023",Business Strategy and Operations,Sales Strategist,Global,T,T
-Alexis,Wallon,"26 Aug, 2024",Corporate,Risk,Global,A,W
-Magali,Richard,"10 Mar, 2025",Health practitioners,Community Lead,Global,M,R
-Tan,Cetiner,"24 Feb, 2025",Engineering,Software Engineer,Global,T,C
-Marion,Cosson,"4 Jan, 2021",Operations,Ops Builder,Global,M,C
-Freddy,Guitton,"9 Sep, 2024",Engineering,Software Engineer,Global,F,G
-Tim,Petricola,"28 Oct, 2019",Engineering,Software Engineer,Global,T,P
-Thomas,Humeau,"27 Feb, 2023",Data,Full Stack Data Scientist,Global,T,H
-Juliette,Raimbault,"2 Dec, 2019",People,Community Lead,Global,J,R
-Aurian,Le Clercq,"24 Mar, 2025",Sales,Account Executive,France,A,L
-Guillaume,Durand,"9 Sep, 2024",Marketing,Product Marketing,Global,G,D
-Antoine,Baudoin,"23 Sep, 2024",Care,User Care Expert,France,A,B
-Aïcha,CHEKKAL,"2 Jan, 2024",Care,User Care Expert,France,A,C
-David,Mattatia,"29 Aug, 2022",Sales,Pre-Sales Specialist,France,D,M
-Antoine,Kahn-Dubois,"12 Sep, 2022",Engineering,Software Engineer,Global,A,K
-Charles,Follet,"23 Oct, 2023",Engineering,Software Engineer,Global,C,F
-Thomas,Mollard,"20 May, 2019",Engineering,Software Engineer,Global,T,M
-Sophie,Lobel,"27 Sep, 2021",Care,User Care Expert,Belgium,S,L
-Christelle,Mozzati,"14 and Research,Product Designer,Global,C,M
-Laura,Gasparini,"17 Jan, 2022",Design and Research,User Researcher,Global,L,G
-Mark,Rogal,"6 Jan, 2025",Operations,Ops Builder,Global,M,R
-Francisco Javier,Alemán Sánchez,"12 Sep, 2022",Talent,Talent,Global,F,A
-Marvyn,Leroy,"19 Jun, 2023",Engineering,Software Engineer,Global,M,L
-Brecht,Verhamme,"4 May, 2020",Operations,Ops Builder,Global,B,V
-Raphaëlle,Robert-Mourey,"26 Aug, 2024",Operations,Ops Builder,Global,R,R
-Manon,Stanguennec,"7 Oct, 2024",Operations,Ops Coordinator,Global,M,S
-Nathan,Trompet,"2 Dec, 2024",Sales,Inbound Sales,Belgium,N,T
-Marion,Bergeret,"15 Jun, 2020",Corporate,Corporate Lead,Global,M,B
-Chloe,Pont,"16 Aug, 2022",Data,Full Stack Data Scientist,Global,C,P
-Grace,Healy,"6 Jan, 2025",Care,User Care Expert,Global,G,H
-Berangere,Giraud,"21 Nov, 2018",Care,Customer Support Specialist - Entreprise,France,B,G
-Sebastien,Phlix,"9 Nov, 2020",Product Management,Product Manager,Spain,S,P
-Dries,Stevens,"28 Sep, 2020",Sales,Sales Lead,Belgium,D,S
-Mathieu,Tanré,"3 Feb, 2025",Associates,Founder Associate,Global,M,T
-Melanie,Alsberghe,"21 Apr, 2022",Product Management,Product Manager,Global,M,A
-Clement,Mennesson,"4 Jun, 2018",Product Management,Product Manager,Global,C,M
-Sarah,Louahem,"25 Mar, 2024",Engineering,Software Engineer,Global,S,L
-Simon,Despretz,"25 May, 2021",Sales,Account Executive,France,S,D
-Remi,Schockmel,"1 Jul, 2019",Sales,Sales Crew Lead,France,R,S
-Lucile,Beranger,"9 Sep, 2024",Care,User Care Expert,France,L,B
-Amélie,Massieu,"20 Nov, 2023",Care,User Care Expert,France,A,M
-Simon,Plard,"28 Mar, 2022",Sales,Business Development Representative,France,S,P
-Joséphine,Collin,"11 Sep, 2023",Marketing,Product Marketing,Global,J,C
-Flavie,de The,"17 Jun, 2019",Data,Full Stack Data Scientist,Global,F,d
-Arthur,Ecoffet,"10 Oct, 2022",Data,Full Stack Data Scientist,Global,A,E
-Mallaury,Schmidt,"8 Nov, 2021",Operations,Ops Coordinator,France,M,S
-Yann,Callens,"7 Jun, 2022",Sales,Account Executive,France,Y,C
-Ariane,Bayat,"15 Apr, 2019",Sales,Sales Crew Lead,France,A,B
-Marie,Giffard,"15 Jul, 2024",Care,User Care Expert,France,M,G
-Laetitia,Bordier,"29 Aug, 2022",Talent,Talent,Global,L,B
-Coline,Brousseau,"15 Jan, 2024",Sales,Pre-Sales Specialist,France,C,B
-Aurelie,Fliedel,"31 Aug, 2020",Marketing,Community Lead,Global,A,F
-Syrine,Burget,"9 Sep, 2024",Operations,Ops Coordinator,Global,S,B
-Xavier,Puyau,"30 Aug, 2021",Sales,Sales Crew Lead,France,X,P
-Cécile,Bedu,"16 Jan, 2023",Marketing,Product Marketing,Global,C,B
-Gerhard,Schaumann,"13 Jan, 2025",Health practitioners,Health Practitioner,Global,G,S
-Lisa,De Pauw,"19 Dec, 2022",Care,User Care Expert,Belgium,L,D
-Augustin,Mine,"7 Jan, 2019",Market and Bet Owners,Community Lead,France,A,M
-Fanette,Lopez,"19 Aug, 2019",Care,Knowledge Specialist,France,F,L
-Augustin,Feraud,"17 Jun, 2024",Sales,Account Executive,France,A,F
-Lotte,Bijlsma,"14 Mar, 2022",Design and Research,Product Designer,Global,L,B
-Fabienne,Bremond,"28 Aug, 2023",Engineering,Software Engineer,Global,F,B
-Mohamed Ghazi,Benabid,"18 May, 2020",Business Strategy and Operations,Sales Strategist,Global,M,B
-Samy,Nouchy,"7 Jun, 2021",Sales,Account Executive,France,S,N
-Celia,Barthel,"25 Apr, 2022",Data,Full Stack Data Scientist,Global,C,B
-Quentin,Barbarat,"15 Feb, 2021",Engineering,Software Engineer,Global,Q,B
-Maria,Cvitkovic,"19 Jul, 2021",People,People Ops,Global,M,C
-Adrien,Albert,"7 Jun, 2021",Marketing,Customer Marketing,Global,A,A
-Ariane,Delanoue,"6 Jan, 2025",Sales,Business Development Representative,France,A,D
-Zsolt,Horváth,"2 Jan, 2024",Engineering,Software Engineer,Global,Z,H
-Julie,Boyer,"28 Jul, 2025",Insurance,Risk,Global,J,B
-Chiara,Marcelo,"6 Feb, 2023",People,People Ops,Global,C,M
-Soline,Pulicani,"13 Sep, 2021",Sales,Account Executive,France,S,P
-Simon,Verlaque,"15 Jun, 2020",Business Strategy and Operations,Sales Strategist,Global,S,V
-Pablo,Martínez Pérez,"17 Jun, 2024",Engineering,Software Engineer,Spain,P,M
-Valentin,Mourtialon,"21 Oct, 2024",Engineering,Software Engineer,Global,V,M
-Alice,Mortier,"2 Jan, 2023",Marketing,Community Associate,Global,A,M
-Vincent,Poulain,"15 Jun, 2020",Engineering,Software Engineer,Global,V,P
-Flora,Ganther,"29 Mar, 2021",Design and Research,Product Designer,Global,F,G
-Lea,Sander,"7 Jun, 2022",Sales,Account Manager,France,L,S
-Etienne,Moreau,"12 Sep, 2022",Care,Customer Support Specialist - Public Sector,France,E,M
-Bruno,Vegreville,"26 Sep, 2022",Product Management,Product Manager,Global,B,V
-Félicie,Martens,"25 Sep, 2023",Sales,Customer Success Manager,France,F,M
-Guillaume,Maarek,"9 Oct, 2023",Product Management,Product Manager,Global,G,M
-Marion,Laouadi,"9 May, 2022",Marketing,Product Marketing,Global,M,L
-Lydia,Martin,"22 Apr, 2022",Health practitioners,Health Practitioner,Global,L,M
-Maxime,Auvy,"9 Oct, 2023",Corporate,Security Engineer,Global,M,A
-Caroline,Boudard,"3 Feb, 2020",Care,Product Specialist,France,C,B
-Anastasia,Melnichenko,"17 Feb, 2020",Design and Research,Product Designer,Global,A,M
-Matthieu,Stombellini,"25 Sep, 2023",Engineering,Software Engineer,Global,M,S
-Osanne,Le cavorsin,"23 Sep, 2024",Sales,Account Executive,France,O,L
-Alix,Vermeulen,"9 Sep, 2024",Data,Full Stack Data Scientist,Global,A,V
-Bastien,Landre,"9 Sep, 2024",Engineering,Software Engineer,Global,B,L
-Eva,Michon,"24 Oct, 2022",Care,Care Crew Lead,Belgium,E,M
-Alexandre,Nasr,"10 Mar, 2025",Data,Full Stack Data Scientist,Global,A,N
-Charles,Gorintin,"1 Jan, 2016",Co-founders,CTO,Global,C,G
-Victoire,Bartholoni,"3 Jan, 2022",Sales,Account Executive,France,V,B
-Alfredo,Schoch,"31 Aug, 2020",Operations,Ops Builder,Global,A,S
-Anne-Caroline,Rérolle,"16 Jan, 2023",Data,Full Stack Data Scientist,Global,A,R
-Laurane,Maitrel,"8 Oct, 2018",Product Management,Product Manager,Global,L,M
-Thomas,Moreaux Chassé,"6 Nov, 2023",Engineering,Software Engineer,Global,T,M
-Maeva-Lucile,Trautsch,"25 Apr, 2022",Care,Product Specialist,France,M,T
-Maarten,Mampaey,"21 May, 2024",Product Management,Product Manager,Global,M,M
-Charlène,Adam,"17 Jan, 2022",Sales,Account Executive,France,C,A
-Camilla,Kasparek,"13 Sep, 2021",Talent,Talent,Global,C,K
-Clemence,Collon,"19 Aug, 2019",Operations,Ops Coordinator,Global,C,C
-John-Michaël,To,"2 Jan, 2024",Engineering,Software Engineer,Global,J,T
-Simon,Treny,"7 Dec, 2020",Engineering,Software Engineer,Global,S,T
-Marie,Hardel,"2 Jul, 2018",Care,Community Lead,Global,M,H
-Maxime,Faidherbe,"3 Jan, 2022",Operations,Ops Builder,Global,M,F
-Anne-Laure,Caralp,"11 Sep, 2023",Marketing,Brand and Content,Global,A,C
-Theo,Sermet,"17 Aug, 2020",Insurance,Insurance Products,France,T,S
-Nils,Prételat,"26 Aug, 2024",Marketing,Field Marketing,France,N,P
-Emilie,Quellec,"4 May, 2020",Sales,Account Executive,France,E,Q
-Kamilia,Bouraoui-Karoui,"21 Nov, 2022",Business Strategy and Operations,CRM manager,Global,K,B
-Mariane,Schueller,"10 Mar, 2025",Business Strategy and Operations,Sales Strategist,Global,M,S
-Aude,Vantyghem,"17 Jan, 2022",People,People Ops,Global,A,V
-Claudia,Roguet,"1 Jul, 2024",Care,User Care Expert,France,C,R
-Lucie,Louvet,"22 Nov, 2021",Care,Care Crew Lead,France,L,L
-Edgar,Anagnostou,"26 Feb, 2024",Marketing,Field Marketing,Global,E,A
-Caroline,Jeangeorges,"23 Nov, 2020",Data,Full Stack Data Scientist,Global,C,J
-Pierre-Adrien,Oudenot,"31 Jan, 2022",Business Strategy and Operations,Sales Strategist,Global,P,O
-Elsa,Delpech,"2 Dec, 2024",Care,User Care Expert,France,E,D
-Louis,Beauval,"10 Feb, 2025",Insurance,Insurance Products,France,L,B
-Timna,Ehrmann,"4 May, 2020",Data,Full Stack Data Scientist,Global,T,E
-Clement,Varin,"14 Mar, 2022",Sales,Inbound Sales,France,C,V
-Guillermo,Duran,"5 Jul, 2021",Sales,Business Development Representative,Spain,G,D
-Louis,Rapin,"19 Jun, 2023",Sales,Customer Success Manager,France,L,R
-Elise,Toureau,"25 Oct, 2021",Corporate,Legal Counsel,Global,E,T
-Romain,Picabea,"4 Jul, 2022",Insurance,Risk,Global,R,P
-Laura,Schwab Revah,"26 Feb, 2024",Sales,Account Manager,France,L,S
-Charlotte,Baudet,"8 Nov, 2021",Operations,Ops Builder,Global,C,B
-Lise,Doublet,"30 Aug, 2021",Care,User Care Expert,France,L,D
-Clement,Dauchy,"29 Mar, 2021",Sales,Account Executive,France,C,D
-Marine,Huber,"22 Apr, 2024",Product Management,Growth Product Manager,Global,M,H
-Igor,Gonzalez Aberasturi,"13 Jan, 2025",Care,User Care Expert,Spain,I,G
-Amandine,Desfachelle,"3 Jan, 2022",Care,Care Crew Lead,France,A,D
-Hana,Meskine,"28 Mar, 2022",Insurance,Insurance Products,France,H,M
-Charles,Dusser,"1 Jul, 2019",Business Strategy and Operations,Community Lead,Global,C,D
-Oscar,Magaldi,"10 Mar, 2025",Operations,Ops Builder,Global,O,M
-Jacob,Batist,"10 Feb, 2025",Marketing,Marketing Acquisition,Global,J,B
-Matthias,Roy,"14 Mar, 2022",Sales,Account Executive,France,M,R
-Emilie,Gueble,"14 Mar, 2022",People,People Ops,Global,E,G
-Mathieu,Ghaleb,"1 Jun, 2020",Engineering,Software Engineer,Global,M,G
-Romain,Lods,"12 Apr, 2021",Engineering,Software Engineer,Global,R,L
-Stephane,Soulier,"20 May, 2019",Data,Full Stack Data Scientist,Global,S,S
-Aurélie,Van Houte,"27 Mar, 2023",Sales,Account Executive,Belgium,A,V
-Chloe,Legrand,"12 Nov, 2018",Care,Care Ops,France,C,L
-Lisa,Spector,"11 Sep, 2023",Health practitioners,Health Practitioner,Global,L,S
-Sonny,Wouters,"4 Nov, 2024",Sales,Account Manager,Belgium,S,W
-Laure,Bonnefoi,"16 Dec, 2019",Care,Product Specialist,France,L,B
-Gilbert,Tchoi,"7 Dec, 2020",Engineering,Software Engineer,Global,G,T
-Louis,Godquin,"24 Apr, 2023",Sales,Inbound Sales,France,L,G
-Wassim,Hassine,"30 Jan, 2023",Sales,Account Executive,France,W,H
-James,Whitbeck,"4 Sep, 2017",Engineering,Software Engineer,Global,J,W
-Emilie,Vanopbrocke,"25 May, 2021",Sales,Account Executive,France,E,V
-Jonathan,Orban,"15 Mar, 2021",Product Management,Product Manager,Canada,J,O
-Tifenn,Boni,"11 Oct, 2021",Business Strategy and Operations,Sales Enabler,Global,T,B
-Alice,Boudhors,"13 Jan, 2025",People,People Ops,Global,A,B
-Jules,Poulet,"26 Sep, 2022",Care,User Care Expert,Belgium,J,P
-Ellen,Verleyen,"15 Feb, 2021",Design and Research,Product Designer,Global,E,V
-Anaïs,Clog,"15 Feb, 2021",Care,Customer Support Specialist - Public Sector,France,A,C
-Marcos,Alfaro,"13 Jan, 2025",Sales,Account Executive,Spain,M,A
-Corentin,Vaillant,"25 Mar, 2024",Sales,Account Executive,France,C,V
-Beatriz,Peñalver Miranda,"16 Jan, 2023",Care,User Care Expert,Spain,B,P
-Yassmine,Boudili,"7 Apr, 2025",Engineering,Software Engineer,Global,Y,B
-Oriana,Bedreddine,"23 Oct, 2023",Care,User Care Expert,France,O,B
-Alexandre,Dubreuil,"7 Dec, 2020",Engineering,Software Engineer,Global,A,D
-Olivia,Mai,"1 Feb, 2021",Insurance,Insurance Products,Spain,O,M
-Lucie,Aunis,"11 Sep, 2023",Sales,Account Executive,France,L,A
-Leo,Andres,"8 Jan, 2018",Care,Care Crew Lead,France,L,A
-Marie-Helene,Stoltz,"18 May, 2020",Business Strategy and Operations,CRM manager,Global,M,S
-Mark,Goad,"15 Jan, 2024",Market and Bet Owners,Unit Lead - Canada,Canada,M,G
-Toon,Roge,"18 Jul, 2022",Insurance,Insurance Products,Belgium,T,R
-Lorraine,Petitdemange,"4 Sep, 2024",Sales,Account Manager,France,L,P
-Anaïs,Chiem,"14 Feb, 2022",Corporate,Corporate Operations,Global,A,C
-Lucía,Muñiz Bris,"12 Feb, 2024",Sales,Business Development Representative,Spain,L,M
-Remy,Safar,"6 Jan, 2025",Sales,Account Executive,France,R,S
-Marie,Dufour,"12 Feb, 2024",Sales,Account Executive,France,M,D
-Nawal,Laslaa,"29N,L
-Juliette,Lugan,"16 Jun, 2025",Sales,Account Executive,France,J,L
-Marie,Stévens,"28 Aug, 2023",Marketing,Customer Marketing,Belgium,M,S
-Diego,Sanchez,"15 Feb, 2021",Sales,Sales Crew Lead,Spain,D,S
-Estelle,Tire,"22 Nov, 2021",Care,User Care Expert,France,E,T
-Camille,Pire,"3 Jun, 2024",Engineering,Software Engineer,Global,C,P
-Julian,Tolosa,"21 Jun, 2021",Care,User Care Expert,Spain,J,T
-François,Robichet,"16 Jun, 2025",Engineering,Software Engineer,Global,F,R
-Nicolas,Pollie,"6 May, 2024",Sales,Account Executive,Belgium,N,P
-Alexandre,Coget,"14 Mar, 2022",Sales,Account Executive,Belgium,A,C
-Ludovic,Bauple,"20 Nov, 2019",Sales,Revenue Lead,Global,L,B
-Cassandra,Horiszny,"23 May, 2022",Sales,Account Executive,France,C,H
-Cyril,Chapellier,"11 Apr, 2022",Engineering,Software Engineer,Global,C,C
-Ford,Spencer,"6 May, 2024",Design and Research,Graphic & Motion Designer,Global,F,S
-Florent,Neuville,"24 Apr, 2023",Business Strategy and Operations,Business Segment Lead,Global,F,N
-Maelle,Le Du,"28 Feb, 2022",Sales,Account Executive,France,M,L
-Marion,Diemer,"16 Jan, 2023",Care,Customer Support Specialist - Entreprise,France,M,D
-Charlie,Mermillod,"13 Mar, 2023",Sales,Account Executive,France,C,M
-Leonard,Fiehl,"6 Jan, 2025",Associates,Founder Associate,Global,L,F
-Coralie,Lucas,"14 Mar, 2022",Care,Customer Support Specialist - Public Sector,France,C,L
-Pauline,Deleuze,"5 Jul, 2021",Workplace,Workplace Experience,Global,P,D
-Loïc,Favaron,"12 Feb, 2024",Sales,Account Executive,France,L,F
-Sophie,Robert,"7 Jun, 2021",Marketing,Field Marketing,France,S,R
-Guillaume,Poirier,"21 Nov, 2022",Care,Care Ops,France,G,P
-Marie,Terpin,"7 Oct, 2024",Care,User Care Expert,France,M,T
-Alix,Boyer de La Giroday,"26 Aug, 2024",Associates,Founder Associate,Global,A,B
-Marie-Line,Dhooge,"23 May, 2022",Sales,Account Manager,Belgium,M,D
-François,Zannotti,"31 Jan, 2022",Corporate,Legal Counsel,Global,F,Z
-Megane,Kerres,"7 Jun, 2022",Sales,Account Executive,Belgium,M,K
-Maryline,Lefebvre,"16 Dec, 2019",Operations,Ops Coordinator,France,M,L
-Pierre,Martin,"24 Mar, 2025",Sales,Account Manager,France,P,M
-Aurélien,Baelde,"9 Sep, 2024",Data,Full Stack Data Scientist,Global,A,B
-Olivia,Ullmann,"15 Jan, 2024",Sales,Sales Crew Lead,France,O,U
-Laetitia,Lamotte,"2 Dec, 2024",Sales,Customer Success Manager,France,L,L
-Paul,Sauveplane,"20 Jun, 2016",Market and Bet Owners,Alaner Experience Lead,Global,P,S
-Chloé,Petit,"14 Aug, 2023",Marketing,Product Marketing,Global,C,P
-Romain,Richard,"7 Oct, 2024",Business Strategy and Operations,Marketing Ops,Global,R,R
-Maylis,Ullenbruch,"1 Feb, 2021",Sales,Account Executive,France,M,U
-François,Verdier,"10 Mar, 2025",Associates,Founder Associate,Global,F,V
-Manon,Brunel,"31 Jul, 2023",Care,Customer Support Specialist - Entreprise,France,M,B
-Julien,Arzul,"22 Apr, 2024",Engineering,Software Engineer,Global,J,A
-Clelia,Pavanetto,"11",Design and Research,Product Content Manager,Global,C,P
-Romain,Lazzarotto,"26 Aug, 2024",Sales,Pre-Sales Specialist,France,R,L
-Lucas,Picot,"11 Apr, 2023",Data,Full Stack Data Scientist,Global,L,P
-Naomie,Fondin,"25 Sep, 2023",Sales,Account Executive,France,N,F
-Paulo,Gemelgo,"6 May, 2019",Insurance,Insurance Business,France,P,G
-Stef,Hamerlinck,"14 Feb, 2022",Marketing,Brand and Content,Global,S,H
-Jean,Barloy,"14 Jan, 2019",Engineering,Software Engineer,Global,J,B
-Christopher,Coles,"2 Jun, 2025",Engineering,Software Engineer,Global,C,C
-Robert,Zyskowski,"23 May, 2016",Engineering,Software Engineer,Global,R,Z
-Peter,Mason,"26 Aug, 2024",Associates,Founder Associate,Global,P,M
-Ladislas,Berthe,"13 Jan, 2025",Insurance,Insurance Business,France,L,B
-Frederic,Ngo,"9 Sep, 2024",Finance,Finance,Global,F,N
-Carlos Felipe,Gonzalez,"14 Mar, 2022",Sales,Business Development Representative,Spain,C,G
-Manou,Van de Walle,"23 May, 2022",Sales,Account Executive,Belgium,M,V
-Tibo,Ghoos,"1 Jul, 2024",Operations,Ops Builder,Global,T,G
-Mariana,Dinu,"25 Mar, 2024",Sales,Account Manager,France,M,D
-Florian,Bouchot,"17 Jan, 2022",Engineering,Software Engineer,Global,F,B
-Virgile,Mermet,"9 May, 2023",Data,Full Stack Data Scientist,Global,V,M
-Charles,Husquin,"16 Jun, 2025",Engineering,Software Engineer,Global,C,H
-Sixtine,Tranie,"22 Nov, 2021",Operations,Ops Builder,Global,S,T
-Oriane,Lallemand,"6 Jan, 2025",Care,Care Ops,France,O,L
-Roxane,Guilhou,"26 Apr, 2021",Sales,Sales Crew Lead,France,R,G
-Michael,Philippart de Foy,"23 May, 2022",Business Strategy and Operations,Business Segment Lead,Global,M,P
-Tristan,du Boys,"20 Jul, 2020",Operations,Ops Coordinator,Global,T,d
-Sebastien,Fredeau,"14 Sep, 2020",Market and Bet Owners,Unit Lead - Belgium,Belgium,S,F
-Tanguy,Saint-Leger,"24 Mar, 2025",Business Strategy and Operations,Business Segment Lead,Global,T,S
-Philip,Bogaers,"2 Dec, 2024",Sales,Account Executive,Belgium,P,B
-Tanguy,Alefsen de Boisredon,"8 Jul, 2024",Associates,Founder Associate,Global,T,A
-Mathieu,Di Lenardo,"10 Apr, 2023",Sales,Account Executive,France,M,D
-Julie,Meunier,"27 Jan, 2025",Insurance,Insurance Products,France,J,M
-Lucie,Touchais,"4 Nov, 2019",People,People Growth,Global,L,T
-Estelle,Robert-Apesteguy,"26 Aug, 2024",Sales,Business Development Representative,France,E,R
-Ophélia,Maudet,"3 Jul, 2023",Sales,Inbound Sales,France,O,M
-Alienor,Dore,"11 Oct, 2021",Marketing,Marketing Acquisition,Global,A,D
-Fanni,Halmai,"6 Jan, 2025",Engineering,Software Engineer,Global,F,H
-Bo,Smet,"22 Apr, 2024",Design and Research,Product Designer,Global,B,S
-Niels,Huybrechts,"17 Mar, 2025",Sales,Account Executive,Belgium,N,H
-Vineeta,Janmeda,"24 Mar, 2025",Marketing,Marketing Acquisition,Global,V,J
-Camille,Leflour,"1 Jul, 2024",Corporate,Legal Counsel,Global,C,L
-Alexandre,Desbiez,"10 Feb, 2025",Engineering,Software Engineer,Global,A,D
-Mathieu,Rombouts,"31 Jul, 2023",Sales,Account Executive,Belgium,M,R
-Fabrice,Staad,"1 Aug, 2016",Market and Bet Owners,Unit Lead - France,France,F,S
-Alexandre,Gerlic,"16 Sep, 2019",Engineering,Community Lead,Global,A,G
-Xavier,Mathieu,"1 Jul, 2024",Care,Customer Support Specialist - Public Sector,France,X,M
-Lorraine,Pipart,"16 Sep, 2019",Operations,Ops Coordinator,France,L,P
-Lorin,Anthonis,"12 Apr, 2021",Sales,Account Executive,Belgium,L,A
-Cecile,Guirauden,"21 Nov, 2022",Business Strategy and Operations,Sales Strategist,France,C,G
-Patrick,von Glehn,"13 Mar, 2023",Data,Full Stack Data Scientist,Global,P,v
-Melissa,Garcia Garcia,"26 Feb, 2024",Design and Research,Brand Designer,Global,M,G
-Ana,Álvarez-Requejo Heredero,"10 Mar, 2025",Sales,Business Development Representative,Spain,A,Á
-Claire,Lenfant-Kodia,"3 Jan, 2022",Engineering,Software Engineer,Global,C,L
-Adil,Chaudhry,"29 Mar, 2021",Insurance,Insurance Products,France,A,C
-Paloma,Artuñedo Nieto,"1 Apr, 2024",Sales,Account Executive,Spain,P,A
-Padma Aiswarya,Kolisetty,"10 May, 2021",Design and Research,Product Designer,Global,P,K
-Laurent,Thevenin,"30 Aug, 2021",Sales,Account Executive,France,L,T
-Sarah,Meyer,"23 Sep, 2024",Care,User Care Expert,France,S,M
-Nicolas,Zermati,"26 Oct, 2020",Engineering,Software Engineer,Global,N,Z
-Juliette,Monnier,"10 Mar, 2025",Associates,Founder Associate,Global,J,M
-Pol,Blet,"4 Sep, 2024",Sales,Account Manager,France,P,B
-Ujala,Anis,"20 Jan, 2020",Design and Research,Community Lead,Global,U,A
-Pierre-Auguste,Beaucote,"31 Aug, 2020",Health practitioners,Health Practitioner,Global,P,B
-Dylan,Leon,"24 Mar, 2025",Engineering,Software Engineer,Global,D,L
-Kevin,Aserraf,"6 Mar, 2017",Marketing,Product Marketing,Global,K,A
-Wilhelmiina Patricia,Sjöblom,"22 Apr, 2024",Operations,Ops Coordinator,Global,W,S
-Philippine,Grisard,"11 Mar, 2024",Care,Care Ops,France,P,G
-Raphaël,Gruber,"5 May, 2025",Insurance,Insurance Products,Global,R,G
-Laurent,de Marcelier de Gaujac,"9 Sep, 2024",Data,Full Stack Data Scientist,Global,L,d
-Zuriñe,Martin,"4 Dec, 2023",Marketing,Growth Marketing,Spain,Z,M
-Thibaut,Caillierez,"25 Mar, 2024",Engineering,Software Engineer,Global,T,C
-Laure,Boutmy,"4 Jan, 2021",Design and Research,UI Designer,Global,L,B
-Thomas,Ribera,"15 Jul, 2024",Care,User Care Expert,France,T,R
-Xochitl,Florimont,"15 Jul, 2024",Design and Research,Graphic & Motion Designer,Global,X,F
-Sandra,May,"19 Jul, 2021",Talent,Talent,France,S,M
-Kylie,Harris,"6 Nov, 2023",Engineering,Software Engineer,Global,K,H
-Thomas,Rolf,"18 Jun, 2018",Product Management,Community Lead,Global,T,R
-Charles,De Berdt,"22 Apr, 2025",Sales,Account Manager,Belgium,C,D
-Marta,de Camps Junoy,"13 Jan, 2025",Sales,Account Executive,Spain,M,d
-Roee,Avnon,"5 Jun, 2023",Engineering,Software Engineer,Global,R,A
-David,Merckle,"7 Oct, 2019",Engineering,Engineering Unit Referent,Global,D,M
-Emilie,Tasté,"2 Dec, 2024",Sales,Account Executive,France,E,T
-Anne-Victoire,Armstrong,"16 Aug, 2023",Care,Security and Legal Specialist,France,A,A
-Joachim,Lis,"1 Feb, 2025",Design and Research,Community Associate,Global,J,L
-Alba,Sánchez Rodríguez,"13 Jan, 2025",Engineering,Software Engineer,Spain,A,S
-Caroline,Carre,"2 Dec, 2019",Care,Care Crew Lead,France,C,C
-Carole,Chambon,"24 Apr, 2023",Sales,Account Manager,France,C,C
-Laurent,Guerin,"15 Jun, 2020",Insurance,Community Lead,Global,L,G
-Thomas,Dudouet,"3 Feb, 2020",Engineering,Software Engineer,Global,T,D
-Valentine,Abbar,"18 Jul, 2022",Operations,Ops Coordinator,Belgium,V,A
-Emma,Lecomte,"14 Mar, 2022",Product Management,Product Manager,Global,E,L
-Aude,Chevalier,"15 Jan, 2024",Care,Outsourcing Delivery Specialist,France,A,C
-Graziella,Blanchet,"2 Jun, 2025",Sales,Pre-Sales Specialist,France,G,B
-Hakim,Essabar,"10 May, 2021",Sales,Sales Crew Lead,France,H,E
-Maëlys,Guiral,"9 Oct, 2023",Operations,Ops Coordinator,Global,M,G
-Olympe,Bensahel-Mercier,"13 Feb, 2023",Sales,Account Executive,France,O,B
-Frederic,Bonnet,"10 Oct, 2022",Engineering,Software Engineer,Global,F,B
-Arielle,Rakoto Andrianarivelo,"9 May, 2023",Sales,Inbound Sales,France,A,R
-Romain,Cochet,"11 Sep, 2023",Sales,Account Manager,France,R,C
-Arnaud,Spanneut,"15 Feb, 2021",Engineering,Software Engineer,Global,A,S
-Julien,Tanghe,"22 Jul, 2024",Engineering,Software Engineer,Global,J,T
-Lynn,Vermeulen,"6 Jan, 2025",Sales,Account Executive,Belgium,L,V
-Cedric,Goovaerts,"29 Mar, 2021",Insurance,Insurance Products,Belgium,C,G
-Maxime,Droy,"1 Aug, 2022",Engineering,Software Engineer,Global,M,D
-Jorge,Buzzo,"26 Apr, 2021",Sales,Account Executive,Spain,J,B
-Naïm,Smutz,"22 Oct, 2018",Care,Product Specialist,France,N,S
-Othman,Moumni Abdou,"13 Feb, 2023",Engineering,Software Engineer,Global,O,M
-Kevin,Yu,"10 Feb, 2025",Engineering,Software Engineer,Global,K,Y
-Lola,Toledano,"2 Dec, 2024",Finance,Finance Ops,Global,L,T
-Guillaume,Nevoux,"1 Jul, 2019",Care,User Care Expert,France,G,N
-Celine,Chu,"7 Jun, 2022",Talent,Talent,Global,C,C
-Mireya,Grizon Ruiz,"16 Aug, 2021",Care,User Care Expert,Spain,M,G
-Virgile,Faury,"29 Mar, 2021",Sales,Account Executive,France,V,F
-Anatole,Juge,"22 May, 2023",Engineering,Software Engineer,Global,A,J
-Raphaël,Ronot,"20 Nov, 2023",Design and Research,Product Designer,Global,R,R
-Manfredi,Bernardi,"27 Jan, 2025",Associates,Founder Associate,Global,M,B
-Elody,Testud,"27 Jan, 2025",Operations,Ops Coordinator,Global,E,T
-Laurie,Delpino,"6 Nov, 2023",Care,User Care Expert,France,L,D
-Roxanne,Callaert,"19 Dec, 2022",Care,User Care Expert,Belgium,R,C
-Léna,Le Gouill,"29 Jan, 2024",Operations,Ops Coordinator,Global,L,L
-Arthur,Brossollet,"26 Apr, 2021",Sales,Account Executive,France,A,B
-Andries,Verweyen,"15 Jan, 2024",Sales,Account Executive,Belgium,A,V
-Léa,Vitally,"7 Apr, 2025",Care,Customer Support Specialist,France,L,V
-Guillaume,Mohr,"13 Mar, 2023",Data,Full Stack Data Scientist,Global,G,M
-Armony,Magin,"2 Dec, 2024",Care,User Care Expert,France,A,M
-Jean-Charles,Samuelian,"1 Jan, 2016",Co-founders,CEO,Global,J,S
-Raphael,de Menthiere,"12 Apr, 2021",Sales,Sales Crew Lead,France,R,d
-Morgane,Pothimah,"4 Sep, 2024",Workplace,Workplace Experience,Global,M,P
-Sandra,Platano,"24 Mar, 2025",Operations,Ops Builder,Global,S,P
-Wouter,Van Eenoo,"27 Sep, 2021",Sales,Account Executive,Belgium,W,V
-Emeline,Meyohas,"3 Jan, 2022",Care,User Care Expert,France,E,M
-Marion,Doumeingts,"1 Oct, 2018",Design and Research,Product Designer,Global,M,D
-Victor,Boutin,"1 Jun, 2020",Sales,Account Executive,France,V,B
-Cody,Démont,"13 Mar, 2,D
-Lara,Hinedi,"6 Jan, 2025",Operations,Ops Coordinator,Global,L,H
-Adrien,Le Gall,"13 Jan, 2025",Engineering,Software Engineer,Global,A,L
-Alice,Mahoney,"1 Oct, 2019",Product Management,Product Manager,Global,A,M
-Aloïs,Veteau,"1 Jul, 2024",Care,Customer Support Specialist - Public Sector,France,A,V
-Kelly,Marie-Angelique,"16 Aug, 2023",Care,User Care Expert,France,K,M
-Dries,Van den Brande,"1 Feb, 2021",Marketing,Marketing Lead,Belgium,D,V
-Tristan,Tham,"18 Jan, 2021",Sales,Sales Crew Lead,France,T,T
-Anne-Lise,Delfanne,"28 Feb, 2022",Corporate,Legal Counsel,Global,A,D
-Damien,Krotkine,"15 Mar, 2021",Engineering,Software Engineer,Global,D,K
-Gabrielle,Prat,"13 Sep, 2021",Data,Full Stack Data Scientist,Global,G,P
-Gaelle,Boblin,"9 May, 2022",Insurance,Insurance Business,France,G,B
-Nelly,Estruch,"12 Feb, 2024",Care,User Care Expert,Spain,N,E
-Morgane,Macé,"27 Jan, 2025",Sales,Account Manager,France,M,M
-Alice,Tellenne,"24 Apr, 2023",Sales,Account Manager,France,A,T
-Adrien,De Sede,"4 Nov, 2024",Engineering,Software Engineer,Global,A,D
-Astrid,Dousselaere,"24 Feb, 2025",Operations,Ops Coordinator,Global,A,D
-Julia,Zaidat,"25 Mar, 2024",Sales,Account Manager,France,J,Z
-Paul,Desgrees du Lou,"26 Apr, 2021",Sales,Account Executive,France,P,D
-Jill,Tipton,"7 Dec, 2020",Design and Research,User Researcher,Global,J,T
-Diogo Oom Alves,Cardoso,"31 Jan, 2022",Operations,Ops Builder,Global,D,C
-Heloïse,Poras,"4 Nov, 2019",Operations,Ops Coordinator,Global,H,P
-Simon,Perre,"15 Jul, 2019",Operations,Ops Builder,Global,S,P
-Tony,Sanchez,"11 Apr, 2022",Engineering,Software Engineer,Global,T,S
-Julia,Marquette,"9 May, 2023",Marketing,Brand and Content,Global,J,M
-Jules,Gautier,"11 Sep, 2023",Care,User Care Expert,France,J,G
-Mihaela,Albu,"12 Nov, 2018",Finance,Community Lead,Global,M,A
-Robin,Rampaer,"15 Jul, 2024",Product Management,Product Manager,Global,R,R
-Félix,Vianey,"11 Mar, 2024",Care,Care Ops,France,F,V
-Aya,Esaki,"23 Sep, 2024",Data,Full Stack Data Scientist,Global,A,E
-David,Rousselie,"31 Aug, 2020",Engineering,Software Engineer,Global,D,R
-Maria,Lopez,"1 Aug, 2022",Design and Research,User Researcher,Global,M,L
-Damien,Berseron,"10 Oct, 2022",Engineering,Software Engineer,Global,D,B
-Nadege,Michel,"15 Mar, 2021",Engineering,Software Engineer,Global,N,M
-Charles,Chaintreau,"27 Sep, 2021",Care,Technical Support,France,C,C
-Vincent,Perrot,"21 Oct, 2019",Operations,Ops Coordinator,France,V,P
-Ann-Sophie,Van Camp,"27 Mar, 2023",Sales,Account Executive,Belgium,A,V
-Patoin,Zougmore,"4 Jan, 2021",Engineering,Software Engineer,Global,P,Z
-Marine,Ronger,"23 May, 2022",Sales,Account Executive,France,M,R
-Claire,Lacroix,"1 Apr, 2019",Operations,Ops Coordinator,France,C,L
-Lucie,Leflour,"29 Oct, 2018",Sales,Sales Lead,France,L,L
-Léa,Ladisa,"9 May, 2023",Care,User Care Expert,France,L,L
-Thomas,Porez,"4 May, 2020",Data,Full Stack Data Scientist,Global,T,P
-Youssef,El Ouard,"11 Sep, 2023",Data,Full Stack Data Scientist,Global,Y,E
-Victor,Pisula,"9 Oct, 2023",Sales,Business Development Representative,France,V,P
-Aude-Line,Picard,"6 Jan, 2025",Sales,Business Development Representative,France,A,P
-Guillaume,Gustin,"12 Apr, 2021",Engineering,Software Engineer,Global,G,G
-Maxence,Damon,"20 Nov, 2023",Care,User Care Expert,France,M,D
-Gauthier,Ritter,"7 Oct, 2024",Care,User Care Expert,France,G,R
-Félicien,Guilbaud,"9 Sep, 2024",Corporate,Internal Audit,Global,F,G
-Antonin,Laporte,"10 Mar, 2025",Sales,Inbound Sales,France,A,L
-Pablo,Duteil,"10 Feb, 2025",Marketing,Marketing (intern),Global,P,D
-Julien,Durand,"1 Jul, 2024",Product Management,Product Manager,Global,J,D
-Eléonore,Lafonta,"22 Apr, 2025",Operations,Ops Builder,Global,E,L
-Sophie,Bussieres Cauberghs,"4 Nov, 2019",Operations,Community Lead,Global,S,B
-Ricardo,Pallas Roman,"31 Jul, 2023",Engineering,Software Engineer,Spain,R,P
-Jean,Saglio,"11 Mar, 2024",Engineering,Software Engineer,Global,J,S
-Laurene,Loubere,"12 Sep, 2022",Operations,Ops Coordinator,Global,L,L
-Naomi,Fagla Medegan,"15 Jul, 2024",Care,User Care Expert,France,N,F
-Robin,Drouche,"22 Nov, 2021",IT,IT Ops Specialist,Global,R,D
-Laetitia,Lefebvre-Nare,"1 Feb, 2021",Operations,Ops Builder,Global,L,L
-Josephine,Brault Scaillet,"12 Sep, 2022",Sales,Account Executive,France,J,B
-Diala,Youssevitch,"1 Jul, 2024",Sales,Account Executive,France,D,Y
-Antoine,Piguet,"28 Sep, 2020",Data,Full Stack Data Scientist,Global,A,P
-Gautier,Chrétien,"15 Jan, 2024",Sales,Account Executive,France,G,C
-Thibault,Jauffret,"18 Jan, 2021",Sales,Account Executive,France,T,J
-Adele,Johann,"7 Dec, 2020",Care,User Care Expert,France,A,J
-Benoît,Prioux,"1 Feb, 2021",Engineering,Software Engineer,Global,B,P
-Zorana,Ratkovic,"17 Jan, 2022",Data,Full Stack Data Scientist,Global,Z,R
-Johanna,Dupin,"9 Oct, 2023",Sales,Business Development Representative,France,J,D
-David,López,"26 Feb, 2024",Sales,Account Executive,Spain,D,L
-Mickaël,Bergem,"31 Aug, 2020",Engineering,Software Engineer,Global,M,B
-Gregoire,Lambert,"1 Aug, 2022",Product Management,Product Manager,Global,G,L
-Manon,Trabuc,"7 Oct, 2019",People,People Ops,Global,M,T
-Maximilian,Quick,"14 Mar, 2022",Sales,Sales Crew Lead,Belgium,M,Q
-Marc,Faget,"2 Mar, 2020",Finance,Finance,Global,M,F
-Arnaud,Buisson,"23 Nov, 2020",Data,Full Stack Data Scientist,Global,A,B
-Clément,Chabut,"15 Jan, 2024",Sales,Account Manager,France,C,C
-Nicolas,Fortin,"9 Nov, 2020",Engineering,Software Engineer,Global,N,F
-Axel,Nemeth,"24 Mar, 2025",Design and Research,Product Designer,Global,A,N
-Camille,Ginoux,"30 Jan, 2023",Sales,Sales Crew Lead,France,C,G
-Bruna,Hamori,"6 Jan, 2025",Operations,Ops Coordinator,Global,B,H
-Kenza,Aboudrar,"16 Aug, 2021",Operations,Ops Builder,Global,K,A
-Robin,Devaux,"28 Aug, 2023",Sales,Business Development Representative,France,R,D
-Clément,Hermier,"17 Jul, 2023",Business Strategy and Operations,Sales Strategist,Global,C,H
-Romain,Braun,"9 Sep, 2024",Engineering,Software Engineer,Global,R,B
-Margaux,Dereux,"16 May, 2022",Operations,Ops Builder,France,M,D
-Aurélie,De Faria,"5 Jun, 2023",Care,User Care Expert,France,A,D
-Pierre,Steiger,"15 Jan, 2024",Finance,Finance,Global,P,S
-Gwen,Bogaert,"10 Feb, 2025",Engineering,Software Engineer,Global,G,B`;
 
 
-        // Function to download a CSV file
+
+        // Données complètes des employés
+
+        const donneesBrutes = `employee_id,first_name,last_name,original_start_date,community,role,first_initial,last_initial
+
+0,Jean-Charles,Samuelian,"1 Jan, 2016",Co-founders,CEO,J,S
+
+1,Charles,Gorintin,"1 Jan, 2016",Co-founders,CTO,C,G
+
+3,Antoine,Lizee,"9 May, 2016",Data,Full Stack Data Scientist,A,L
+
+4,Robert,Zyskowski,"23 May, 2016",Engineering,Software Engineer,R,Z
+
+6,Paul,Sauveplane,"20 Jun, 2016",Market and Bet Owners,Alaner Experience Lead,P,S
+
+8,Fabrice,Staad,"1 Aug, 2016",Market and Bet Owners,Unit Lead - France,F,S
+
+10,Kevin,Aserraf,"6 Mar, 2017",Marketing,Product Marketing,K,A
+
+13,Olivier,Sambourg,"6 Jun, 2017",Engineering,Software Engineer,O,S
+
+15,James,Whitbeck,"4 Sep, 2017",Engineering,Software Engineer,J,W
+
+19,Leo,Andres,"8 Jan, 2018",Care,Care Crew Lead,L,A
+
+23,Vincent,Brachet,"9 Apr, 2018",Sales,Sales Crew Lead,V,B
+
+22,Clement,Mennesson,"4 Jun, 2018",Product Management,Product Manager,C,M
+
+24,Thomas,Rolf,"18 Jun, 2018",Product Management,Community Lead,T,R
+
+28,Marie,Hardel,"2 Jul, 2018",Care,Community Lead,M,H
+
+34,Cyril,Vinot,"3 Jul, 2018",Data,Full Stack Data Scientist,C,V
+
+46,Benjamin,Benouarka,"24 Sep, 2018",IT,IT Ops Specialist,B,B
+
+44,Marion,Doumeingts,"1 Oct, 2018",Design and Research,Product Designer,M,D
+
+57,Eleonore,Adrian,"1 Oct, 2018",Sales,Sales Crew Lead,E,A
+
+38,Laurane,Maitrel,"8 Oct, 2018",Product Management,Product Manager,L,M
+
+47,Julien,Chenat,"15 Oct, 2018",Design and Research,Product Designer,J,C
+
+60,Naïm,Smutz,"22 Oct, 2018",Care,Product Specialist,N,S
+
+45,Lucie,Leflour,"29 Oct, 2018",Sales,Sales Lead,L,L
+
+51,Chloe,Legrand,"12 Nov, 2018",Care,Care Ops,C,L
+
+61,Mihaela,Albu,"12 Nov, 2018",Finance,Community Lead,M,A
+
+65,Berangere,Giraud,"21 Nov, 2018",Care,Customer Support Specialist - Entreprise,B,G
+
+55,Antoine,Moulet,"1 Dec, 2018",Product Management,Product Manager,A,M
+
+64,Augustin,Mine,"7 Jan, 2019",Market and Bet Owners,Community Lead,A,M
+
+58,Jean,Barloy,"14 Jan, 2019",Engineering,Software Engineer,J,B
+
+66,Thierry,Godfroid,"4 Feb, 2019",Engineering,Software Engineer,T,G
+
+77,Victor,Dancette,"1 Apr, 2019",Sales,Sales Crew Lead,V,D
+
+84,Claire,Lacroix,"1 Apr, 2019",Operations,Ops Coordinator,C,L
+
+83,Ariane,Bayat,"15 Apr, 2019",Sales,Sales Crew Lead,A,B
+
+70,Paulo,Gemelgo,"6 May, 2019",Insurance,Insurance Business,P,G
+
+86,Thomas,Mollard,"20 May, 2019",Engineering,Software Engineer,T,M
+
+102,Stephane,Soulier,"20 May, 2019",Data,Full Stack Data Scientist,S,S
+
+82,Antoine,Jackson,"17 Jun, 2019",Engineering,Software Engineer,A,J
+
+97,Flavie,de The,"17 Jun, 2019",Data,Full Stack Data Scientist,F,d
+
+87,Remi,Schockmel,"1 Jul, 2019",Sales,Sales Crew Lead,R,S
+
+94,Guillaume,Nevoux,"1 Jul, 2019",IT,IT Ops Specialist,G,N
+
+100,Remy-Christophe,Schermesser,"1 Jul, 2019",Engineering,Engineering Unit Referent,R,S
+
+112,Charles,Dusser,"1 Jul, 2019",Business Strategy and Operations,Community Lead,C,D
+
+99,Simon,Perre,"15 Jul, 2019",Operations,Ops Builder,S,P
+
+123,Clemence,Collon,"19 Aug, 2019",Operations,Ops Coordinator,C,C
+
+131,Fanette,Lopez,"19 Aug, 2019",Care,Knowledge Specialist,F,L
+
+117,Thomas,Repichet,"2 Sep, 2019",Sales,Sales Crew Lead,T,R
+
+120,Pierre-Yves,Caneill,"2 Sep, 2019",Engineering,Software Engineer,P,C
+
+116,Lorraine,Pipart,"16 Sep, 2019",Operations,Ops Coordinator,L,P
+
+128,Alexandre,Gerlic,"16 Sep, 2019",Engineering,Community Lead,A,G
+
+114,Clement,Sixdenier,"7 Oct, 2019",Sales,Account Manager,C,S
+
+121,David,Merckle,"7 Oct, 2019",Engineering,Engineering Unit Referent,D,M
+
+132,Manon,Trabuc,"7 Oct, 2019",People,People Ops,M,T
+
+143,Florian,Gagnadre,"7 Oct, 2019",Engineering,Software Engineer,F,G
+
+149,Lucie,Paladino,"7 Oct, 2019",Workplace,Community Lead,L,P
+
+134,Vincent,Perrot,"21 Oct, 2019",Operations,Ops Coordinator,V,P
+
+154,Maxence,Bouret,"21 Oct, 2019",Engineering,Software Engineer,M,B
+
+122,Lucie,Touchais,"4 Nov, 2019",People,People Growth,L,T
+
+137,Heloïse,Poras,"4 Nov, 2019",Operations,Ops Coordinator,H,P
+
+155,Sophie,Bussieres Cauberghs,"4 Nov, 2019",Operations,Community Lead,S,B
+
+141,Julie,Rossi,"18 Nov, 2019",Engineering,Software Engineer,J,R
+
+152,Ludovic,Bauple,"20 Nov, 2019",Sales,Revenue Lead,L,B
+
+138,Caroline,Carre,"2 Dec, 2019",Care,Care Crew Lead,C,C
+
+159,Juliette,Raimbault,"2 Dec, 2019",People,Community Lead,J,R
+
+163,Maryline,Lefebvre,"16 Dec, 2019",Operations,Ops Coordinator,M,L
+
+168,Laure,Bonnefoi,"16 Dec, 2019",Care,Product Specialist,L,B
+
+178,Lea,Vallerian,"16 Dec, 2019",Operations,Ops Coordinator,L,V
+
+145,Ujala,Anis,"20 Jan, 2020",Design and Research,Community Lead,U,A
+
+166,Caroline,Boudard,"3 Feb, 2020",Care,Product Specialist,C,B
+
+181,Thomas,Dudouet,"3 Feb, 2020",Engineering,Software Engineer,T,D
+
+179,Anastasia,Melnichenko,"17 Feb, 2020",Design and Research,Product Designer,A,M
+
+172,Marc,Faget,"2 Mar, 2020",Finance,Finance,M,F
+
+201,Romain,Stourm,"6 Apr, 2020",Sales,Sales Crew Lead,R,S
+
+204,Donatien,Laplace,"6 Apr, 2020",Sales,Account Executive,D,L
+
+216,Gregoire,Roussel,"6 Apr, 2020",Sales,Account Executive,G,R
+
+193,Maxime,Robinet,"4 May, 2020",Design and Research,Product Designer,M,R
+
+195,Emilie,Quellec,"4 May, 2020",Sales,Account Executive,E,Q
+
+196,Thomas,Porez,"4 May, 2020",Data,Full Stack Data Scientist,T,P
+
+197,Timna,Ehrmann,"4 May, 2020",Data,Full Stack Data Scientist,T,E
+
+221,Brecht,Verhamme,"4 May, 2020",Operations,Ops Builder,B,V
+
+223,Mohamed Ghazi,Benabid,"18 May, 2020",Business Strategy and Operations,Sales Strategist,M,B
+
+227,Marie-Helene,Stoltz,"18 May, 2020",Business Strategy and Operations,CRM manager,M,S
+
+236,Thibault,Devalle-Predieri,"18 May, 2020",Sales,Account Executive,T,D
+
+210,Mathieu,Ghaleb,"1 Jun, 2020",Engineering,Software Engineer,M,G
+
+237,Victor,Boutin,"1 Jun, 2020",Sales,Account Executive,V,B
+
+235,Laurent,Guerin,"15 Jun, 2020",Insurance,Community Lead,L,G
+
+242,Marion,Bergeret,"15 Jun, 2020",Corporate,Corporate Lead,M,B
+
+245,Simon,Verlaque,"15 Jun, 2020",Business Strategy and Operations,Sales Strategist,S,V
+
+247,Vincent,Poulain,"15 Jun, 2020",Engineering,Software Engineer,V,P
+
+230,Thomas,Quinot,"6 Jul, 2020",Corporate,Information security lead / CISO,T,Q
+
+249,Estelle,Pasteau,"20 Jul, 2020",Talent,Talent,E,P
+
+258,Tristan,du Boys,"20 Jul, 2020",Operations,Ops Coordinator,T,d
+
+234,Theo,Sermet,"17 Aug, 2020",Insurance,Insurance Products,T,S
+
+248,Sebastien,de Larquier,"17 Aug, 2020",Data,Community Lead,S,d
+
+240,Aurelie,Fliedel,"31 Aug, 2020",Marketing,Community Lead,A,F
+
+257,David,Rousselie,"31 Aug, 2020",Engineering,Software Engineer,D,R
+
+261,Alfredo,Schoch,"31 Aug, 2020",Operations,Ops Builder,A,S
+
+259,Sebastien,Fredeau,"14 Sep, 2020",Market and Bet Owners,Unit Lead - Belgium,S,F
+
+251,Josephine,Gaillet,"28 Sep, 2020",Care,Care Ops,J,G
+
+254,Dries,Stevens,"28 Sep, 2020",Sales,Sales Lead,D,S
+
+255,Nicolas,Zermati,"26 Oct, 2020",Engineering,Software Engineer,N,Z
+
+164,Lea,Vaude,"3 Sep, 2024",Sales,Customer Success Manager,L,V`;
+
+
+
+        // Fonction pour télécharger un fichier CSV
+
         function triggerUserFileDownload(options) {
+
             const { content, filename } = options;
+
             const blob = new Blob([content], { type: 'text/csv' });
+
             const url = URL.createObjectURL(blob);
+
             const a = document.createElement('a');
+
             a.href = url;
+
             a.download = filename;
+
             document.body.appendChild(a);
+
             a.click();
+
             document.body.removeChild(a);
+
             URL.revokeObjectURL(url);
+
         }
 
-        // Levenshtein distance function (similarity measure between two strings)
+
+
+        // Fonction de calcul de la distance de Levenshtein (mesure de similarité entre deux chaînes)
+
         function levenshteinDistance(a, b) {
+
             const matrix = [];
+
             
-            // Increment
+
+            // Incrémente
+
             function increment(i, j) {
+
                 return matrix[i][j] + 1;
+
             }
+
             
+
             // Insertion
+
             function insertion(i, j) {
+
                 return matrix[i][j - 1] + 1;
+
             }
+
             
+
             // Substitution
+
             function substitution(i, j) {
+
                 return matrix[i - 1][j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0);
+
             }
+
             
-            // Initialize matrix
+
+            // Initialisation de la matrice
+
             for (let i = 0; i <= a.length; i++) {
+
                 matrix[i] = [i];
+
             }
+
             
+
             for (let j = 1; j <= b.length; j++) {
+
                 matrix[0][j] = j;
+
             }
+
             
-            // Fill the matrix
+
+            // Remplissage de la matrice
+
             for (let i = 1; i <= a.length; i++) {
+
                 for (let j = 1; j <= b.length; j++) {
+
                     matrix[i][j] = Math.min(
-                        increment(i - 1, j),     // deletion
+
+                        increment(i - 1, j),     // suppression
+
                         insertion(i, j),         // insertion
+
                         substitution(i, j)       // substitution
+
                     );
+
                 }
+
             }
+
             
+
             return matrix[a.length][b.length];
+
         }
 
-        // Calculate similarity between two strings (between 0 and 1)
+
+
+        // Calcule la similarité entre deux chaînes (entre 0 et 1)
+
         function calculateSimilarity(str1, str2) {
+
             const maxLength = Math.max(str1.length, str2.length);
-            if (maxLength === 0) return 1.0; // If both strings are empty, they are identical
+
+            if (maxLength === 0) return 1.0; // Si les deux chaînes sont vides, elles sont identiques
+
             
+
             const distance = levenshteinDistance(str1, str2);
+
             return 1.0 - distance / maxLength;
+
         }
 
-        // Main component
+
+
+        // Composant principal
+
         function App() {
-            const [employees, setEmployees] = useState([]);
-            const [employeesLoaded, setEmployeesLoaded] = useState(false);
-            const [search, setSearch] = useState("");
+
+            const [employes, setEmployes] = useState([]);
+
+            const [employesCharges, setEmployesCharges] = useState(false);
+
+            const [recherche, setRecherche] = useState("");
+
             const [message, setMessage] = useState("");
-            const [stats, setStats] = useState({ total: 0, discovered: 0, score: 0 });
-            const [communityFilter, setCommunityFilter] = useState("All");
-            const [communities, setCommunities] = useState([]);
-            const [hintsActive, setHintsActive] = useState({
-                initials: false,
-                nameLength: false
+
+            const [stats, setStats] = useState({ total: 0, decouverts: 0, score: 0 });
+
+            const [indicesActives, setIndicesActives] = useState({
+
+                communaute: false,
+
+                role: false,
+
+                initiales: false
+
             });
+
             
-            // Similarity threshold for approximate matching (0.8 = 80% similarity)
-            const [similarityThreshold, setSimilarityThreshold] = useState(0.8);
+
+            // Seuil de similarité pour la correspondance approximative (0.8 = 80% de similarité)
+
+            const [seuilSimilarite, setSeuilSimilarite] = useState(0.8);
+
             
-            // Timer states
-            const [gameStarted, setGameStarted] = useState(false);
-            const [timeRemaining, setTimeRemaining] = useState(3600); // 1 hour in seconds
-            const [gameEnded, setGameEnded] = useState(false);
+
+            // États pour le timer
+
+            const [jeuCommence, setJeuCommence] = useState(false);
+
+            const [tempsRestant, setTempsRestant] = useState(3600); // 1 heure en secondes
+
+            const [jeuTermine, setJeuTermine] = useState(false);
+
             const timerRef = useRef(null);
+
             
-            // Reference to maintain scroll position
+
+            // Référence pour maintenir la position de défilement
+
             const scrollPositionRef = useRef(0);
 
-            // Load data on startup
+
+
+            // Charger les données au démarrage
+
             useEffect(() => {
-                // Parse CSV
+
+                // Parser le CSV
+
                 Papa.parse(donneesBrutes, {
+
                     header: true,
+
                     skipEmptyLines: true,
+
                     complete: function(results) {
-                        // Transform data
-                        const data = results.data.map(function(employee) {
+
+                        // Transformer les données
+
+                        const donnees = results.data.map(function(employe) {
+
                             return {
-                                firstName: employee.FIRST_NAME,
-                                lastName: employee.LAST_NAME,
-                                startDate: employee.START_DATE,
-                                scope: employee.SCOPE,
-                                role: employee.ROLE,
-                                community: employee.COMMUNITY,
-                                firstInitial: employee.FIRST_LETTER_FIRST_NAME || employee.FIRST_NAME.charAt(0),
-                                lastInitial: employee.FIRST_LETTER_LAST_NAME || employee.LAST_NAME.charAt(0),
-                                lastNameLength: employee.LAST_NAME.length,
-                                discovered: false
+
+                                id: employe.employee_id,
+
+                                prenom: employe.first_name,
+
+                                nom: employe.last_name,
+
+                                dateDebut: employe.original_start_date,
+
+                                communaute: employe.community,
+
+                                role: employe.role,
+
+                                initialePrenom: employe.first_initial,
+
+                                initialeNom: employe.last_initial,
+
+                                longueurNom: employe.last_name.length,
+
+                                decouvert: false
+
                             };
+
                         });
+
                         
-                        setEmployees(data);
-                        setStats({ total: data.length, discovered: 0, score: 0 });
+
+                        // Trier les employés par ID
+
+                        donnees.sort(function(a, b) {
+
+                            return parseInt(a.id) - parseInt(b.id);
+
+                        });
+
                         
-                        // Extract unique communities
-                        const uniqueCommunities = ["All", ...new Set(data.map(e => e.community))].sort();
-                        setCommunities(uniqueCommunities);
+
+                        setEmployes(donnees);
+
+                        setStats({ total: donnees.length, decouverts: 0, score: 0 });
+
                         
-                        setEmployeesLoaded(true);
+
+                        setEmployesCharges(true);
+
                     }
+
                 });
+
             }, []);
 
-            // Timer management
+
+
+            // Gestion du timer
+
             useEffect(() => {
-                if (gameStarted && !gameEnded) {
+
+                if (jeuCommence && !jeuTermine) {
+
                     timerRef.current = setInterval(function() {
-                        setTimeRemaining(function(prev) {
+
+                        setTempsRestant(function(prev) {
+
                             if (prev <= 1) {
+
                                 clearInterval(timerRef.current);
-                                setGameEnded(true);
+
+                                setJeuTermine(true);
+
                                 
-                                // Reveal all answers when time is up
-                                setEmployees(function(prevEmployees) {
-                                    return prevEmployees.map(function(employee) {
+
+                                // Révéler toutes les réponses quand le temps est écoulé
+
+                                setEmployes(function(prevEmployes) {
+
+                                    return prevEmployes.map(function(employe) {
+
                                         return {
-                                            ...employee,
-                                            discovered: true
+
+                                            ...employe,
+
+                                            decouvert: true
+
                                         };
+
                                     });
+
                                 });
+
                                 
+
                                 return 0;
+
                             }
+
                             return prev - 1;
+
                         });
+
                     }, 1000);
+
                 }
+
                 
+
                 return function() {
+
                     if (timerRef.current) {
+
                         clearInterval(timerRef.current);
-                    }
-                };
-            }, [gameStarted, gameEnded]);
 
-            // Start the game
-            function startGame() {
-                setGameStarted(true);
-                setTimeRemaining(3600); // 1 hour
-                setGameEnded(false);
+                    }
+
+                };
+
+            }, [jeuCommence, jeuTermine]);
+
+
+
+            // Commencer le jeu
+
+            function commencerJeu() {
+
+                setJeuCommence(true);
+
+                setTempsRestant(3600); // 1 heure
+
+                setJeuTermine(false);
+
                 
-                // Reset discovered employees
-                setEmployees(function(prevEmployees) {
-                    return prevEmployees.map(function(employee) {
+
+                // Réinitialiser les employés découverts
+
+                setEmployes(function(prevEmployes) {
+
+                    return prevEmployes.map(function(employe) {
+
                         return {
-                            ...employee,
-                            discovered: false
+
+                            ...employe,
+
+                            decouvert: false
+
                         };
+
                     });
+
                 });
+
                 
+
                 setStats(function(prev) { 
-                    return { ...prev, discovered: 0, score: 0 };
+
+                    return { ...prev, decouverts: 0, score: 0 };
+
                 });
+
             }
 
-            // Format remaining time
-            function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+
+            // Formater le temps restant
+
+            function formaterTemps(secondes) {
+
+                const minutes = Math.floor(secondes / 60);
+
+                const secondesRestantes = secondes % 60;
+
+                return `${minutes.toString().padStart(2, '0')}:${secondesRestantes.toString().padStart(2, '0')}`;
+
             }
 
-            // Organize employees by community
-            const employeesByCommmunity = employees.reduce(function(acc, employee) {
-                if (communityFilter !== "All" && employee.community !== communityFilter) {
-                    return acc;
-                }
-                
-                if (!acc[employee.community]) {
-                    acc[employee.community] = [];
-                }
-                acc[employee.community].push(employee);
-                return acc;
-            }, {});
 
-            // Find the best match for a searched name
-            function findBestMatch(searchedName) {
-                let bestMatch = null;
-                let bestSimilarity = 0;
+
+            // Trouver le meilleur match pour un nom recherché
+
+            function trouverMeilleurMatch(nomRecherche) {
+
+                let meilleurMatch = null;
+
+                let meilleureSimilarite = 0;
+
                 
-                employees.forEach(function(employee) {
-                    if (!employee.discovered) {
-                        const similarity = calculateSimilarity(
-                            searchedName.toLowerCase(),
-                            employee.lastName.toLowerCase()
+
+                employes.forEach(function(employe) {
+
+                    if (!employe.decouvert) {
+
+                        const similarite = calculateSimilarity(
+
+                            nomRecherche.toLowerCase(),
+
+                            employe.nom.toLowerCase()
+
                         );
+
                         
-                        if (similarity > bestSimilarity && similarity >= similarityThreshold) {
-                            bestSimilarity = similarity;
-                            bestMatch = employee;
+
+                        if (similarite > meilleureSimilarite && similarite >= seuilSimilarite) {
+
+                            meilleureSimilarite = similarite;
+
+                            meilleurMatch = employe;
+
                         }
+
                     }
+
                 });
+
                 
-                return { employee: bestMatch, similarity: bestSimilarity };
+
+                return { employe: meilleurMatch, similarite: meilleureSimilarite };
+
             }
 
-            // Handle form submission without scrolling
-            function checkName(e) {
+
+
+            // Gérer la soumission du formulaire sans défilement
+
+            function verifierNom(e) {
+
                 e.preventDefault();
+
                 
-                // Save current scroll position
+
+                // Sauvegarder la position de défilement actuelle
+
                 scrollPositionRef.current = window.scrollY;
+
                 
-                if (!gameStarted || gameEnded) {
-                    setMessage(gameEnded ? "Time's up! All answers are revealed. Click 'Restart' to play again." : "Click 'Start' to begin the game.");
+
+                if (!jeuCommence || jeuTermine) {
+
+                    setMessage(jeuTermine ? "Le temps est écoulé ! Toutes les réponses sont révélées. Cliquez sur 'Recommencer' pour jouer à nouveau." : "Cliquez sur 'Commencer' pour démarrer le jeu.");
+
                     return;
+
                 }
+
                 
-                if (!search.trim()) {
-                    setMessage("Please enter a last name");
+
+                if (!recherche.trim()) {
+
+                    setMessage("Veuillez entrer un nom");
+
                     return;
+
                 }
+
                 
-                const searchedName = search.trim().toLowerCase();
+
+                const nomRecherche = recherche.trim().toLowerCase();
+
                 
-                // Check if the name is exactly the same
-                const exactEmployee = employees.find(
-                    function(e) { return e.lastName.toLowerCase() === searchedName && !e.discovered; }
+
+                // Vérifier si le nom est exactement le même
+
+                const employeExact = employes.find(
+
+                    function(e) { return e.nom.toLowerCase() === nomRecherche && !e.decouvert; }
+
                 );
+
                 
-                // If no exact match, look for the best match
-                if (!exactEmployee) {
-                    const { employee: bestMatch, similarity } = findBestMatch(searchedName);
+
+                // Si pas de correspondance exacte, chercher le meilleur match
+
+                if (!employeExact) {
+
+                    const { employe: meilleurMatch, similarite } = trouverMeilleurMatch(nomRecherche);
+
                     
-                    if (bestMatch) {
-                        // Found an approximate match
-                        let pointsEarned = 5; // Default, 5 points without hints
-                        if (hintsActive.initials && hintsActive.nameLength) {
-                            pointsEarned = 1; // 1 point with both hints
-                        } else if (hintsActive.initials || hintsActive.nameLength) {
-                            pointsEarned = 3; // 3 points with one hint
+
+                    if (meilleurMatch) {
+
+                        // Trouver un match approximatif
+
+                        let pointsGagnes = 10; // Par défaut, 10 points sans indices
+
+                        
+
+                        // Calculer les points en fonction des indices utilisés
+
+                        if (indicesActives.communaute && indicesActives.role && indicesActives.initiales) {
+
+                            pointsGagnes = 1; // 1 point avec tous les indices
+
+                        } else if ((indicesActives.communaute && indicesActives.role) || 
+
+                                (indicesActives.communaute && indicesActives.initiales) || 
+
+                                (indicesActives.role && indicesActives.initiales)) {
+
+                            pointsGagnes = 3; // 3 points avec deux indices
+
+                        } else if (indicesActives.communaute || indicesActives.role || indicesActives.initiales) {
+
+                            pointsGagnes = 5; // 5 points avec un seul indice
+
                         }
+
                         
-                        // Slightly reduce points for approximate matches
-                        pointsEarned = Math.round(pointsEarned * similarity);
+
+                        // Réduire légèrement les points pour les correspondances approximatives
+
+                        pointsGagnes = Math.round(pointsGagnes * similarite);
+
                         
+
                         setStats(function(prev) { 
+
                             return { 
+
                                 ...prev, 
-                                discovered: prev.discovered + 1,
-                                score: prev.score + pointsEarned
+
+                                decouverts: prev.decouverts + 1,
+
+                                score: prev.score + pointsGagnes
+
                             };
+
                         });
+
                         
-                        // Update employee as discovered
-                        setEmployees(function(prev) {
+
+                        // Mettre à jour l'employé comme découvert
+
+                        setEmployes(function(prev) {
+
                             return prev.map(function(e) {
-                                return e.lastName === bestMatch.lastName ? { ...e, discovered: true } : e;
+
+                                return e.nom === meilleurMatch.nom ? { ...e, decouvert: true } : e;
+
                             });
+
                         });
+
                         
-                        setMessage(`Well done! You found an employee with a similar name: "${bestMatch.firstName} ${bestMatch.lastName}" (${Math.round(similarity * 100)}% similarity). +${pointsEarned} points!`);
-                        setSearch("");
+
+                        setMessage(`Bravo ! Vous avez trouvé un employé avec un nom similaire : "${meilleurMatch.prenom} ${meilleurMatch.nom}" (${Math.round(similarite * 100)}% de similarité). +${pointsGagnes} points !`);
+
+                        setRecherche("");
+
                         
-                        // Restore scroll position after rendering
+
+                        // Restaurer la position de défilement après le rendu
+
                         setTimeout(function() {
+
                             window.scrollTo(0, scrollPositionRef.current);
+
                         }, 0);
+
                         
+
                         return;
+
                     }
+
                     
-                    // Check if employee has already been discovered
-                    const alreadyDiscoveredEmployee = employees.find(
-                        function(e) { return e.lastName.toLowerCase() === searchedName && e.discovered; }
+
+                    // Vérifier si l'employé a déjà été découvert
+
+                    const employeDejaDecouvert = employes.find(
+
+                        function(e) { return e.nom.toLowerCase() === nomRecherche && e.decouvert; }
+
                     );
+
                     
-                    if (alreadyDiscoveredEmployee) {
-                        setMessage(`You've already discovered ${alreadyDiscoveredEmployee.firstName} ${alreadyDiscoveredEmployee.lastName}.`);
+
+                    if (employeDejaDecouvert) {
+
+                        setMessage(`Vous avez déjà découvert ${employeDejaDecouvert.prenom} ${employeDejaDecouvert.nom}.`);
+
                     } else {
-                        setMessage(`No employee found with the last name "${search}".`);
+
+                        setMessage(`Aucun employé trouvé avec le nom "${recherche}".`);
+
                     }
+
                     
-                    setSearch("");
+
+                    setRecherche("");
+
                     
-                    // Restore scroll position after rendering
+
+                    // Restaurer la position de défilement après le rendu
+
                     setTimeout(function() {
+
                         window.scrollTo(0, scrollPositionRef.current);
+
                     }, 0);
+
                     
+
                     return;
+
                 }
+
                 
-                // Exact match found
-                let pointsEarned = 5; // Default, 5 points without hints
-                if (hintsActive.initials && hintsActive.nameLength) {
-                    pointsEarned = 1; // 1 point with both hints
-                } else if (hintsActive.initials || hintsActive.nameLength) {
-                    pointsEarned = 3; // 3 points with one hint
+
+                // Correspondance exacte trouvée
+
+                let pointsGagnes = 10; // Par défaut, 10 points sans indices
+
+                
+
+                // Calculer les points en fonction des indices utilisés
+
+                if (indicesActives.communaute && indicesActives.role && indicesActives.initiales) {
+
+                    pointsGagnes = 1; // 1 point avec tous les indices
+
+                } else if ((indicesActives.communaute && indicesActives.role) || 
+
+                        (indicesActives.communaute && indicesActives.initiales) || 
+
+                        (indicesActives.role && indicesActives.initiales)) {
+
+                    pointsGagnes = 3; // 3 points avec deux indices
+
+                } else if (indicesActives.communaute || indicesActives.role || indicesActives.initiales) {
+
+                    pointsGagnes = 5; // 5 points avec un seul indice
+
                 }
+
                 
+
                 setStats(function(prev) { 
+
                     return { 
+
                         ...prev, 
-                        discovered: prev.discovered + 1,
-                        score: prev.score + pointsEarned
+
+                        decouverts: prev.decouverts + 1,
+
+                        score: prev.score + pointsGagnes
+
                     };
+
                 });
+
                 
-                // Update employee as discovered
-                setEmployees(function(prev) {
+
+                // Mettre à jour l'employé comme découvert
+
+                setEmployes(function(prev) {
+
                     return prev.map(function(e) {
-                        return e === exactEmployee ? { ...e, discovered: true } : e;
+
+                        return e === employeExact ? { ...e, decouvert: true } : e;
+
                     });
+
                 });
+
                 
-                setMessage(`Well done! You found ${exactEmployee.firstName} ${exactEmployee.lastName}. +${pointsEarned} points!`);
-                setSearch("");
+
+                setMessage(`Bravo ! Vous avez trouvé ${employeExact.prenom} ${employeExact.nom}. +${pointsGagnes} points !`);
+
+                setRecherche("");
+
                 
-                // Restore scroll position after rendering
+
+                // Restaurer la position de défilement après le rendu
+
                 setTimeout(function() {
+
                     window.scrollTo(0, scrollPositionRef.current);
+
                 }, 0);
+
             }
 
-            // Toggle hints
-            function toggleHint(hint) {
-                if (!gameStarted || gameEnded) return;
+
+
+            // Activer/désactiver les indices
+
+            function toggleIndice(indice) {
+
+                if (!jeuCommence || jeuTermine) return;
+
                 
-                setHintsActive(function(prev) {
+
+                setIndicesActives(function(prev) {
+
                     const newState = { ...prev };
-                    newState[hint] = !prev[hint];
+
+                    newState[indice] = !prev[indice];
+
                     return newState;
+
                 });
+
             }
 
-            // Reset the game
-            function reset() {
+
+
+            // Réinitialiser le jeu
+
+            function reinitialiser() {
+
                 if (timerRef.current) {
+
                     clearInterval(timerRef.current);
+
                 }
+
                 
-                setEmployees(employees.map(function(e) { return { ...e, discovered: false }; }));
-                setStats({ total: employees.length, discovered: 0, score: 0 });
-                setHintsActive({ initials: false, nameLength: false });
-                setGameStarted(false);
-                setGameEnded(false);
-                setTimeRemaining(3600);
-                setMessage("Game reset!");
+
+                setEmployes(employes.map(function(e) { return { ...e, decouvert: false }; }));
+
+                setStats({ total: employes.length, decouverts: 0, score: 0 });
+
+                setIndicesActives({ communaute: false, role: false, initiales: false });
+
+                setJeuCommence(false);
+
+                setJeuTermine(false);
+
+                setTempsRestant(3600);
+
+                setMessage("Jeu réinitialisé !");
+
             }
 
-            // Export data as CSV
-            function exportCSV() {
-                const header = "FIRST_NAME,LAST_NAME,START_DATE,SCOPE,ROLE,COMMUNITY,FIRST_LETTER_FIRST_NAME,FIRST_LETTER_LAST_NAME\n";
-                const lines = employees.map(function(e) {
-                    return `${e.firstName},${e.lastName},${e.startDate},${e.scope},${e.role},${e.community},${e.firstInitial},${e.lastInitial}`;
+
+
+            // Exporter les données sous format CSV
+
+            function exporterCSV() {
+
+                const header = "employee_id,first_name,last_name,original_start_date,community,role,first_initial,last_initial\n";
+
+                const lignes = employes.map(function(e) {
+
+                    return `${e.id},${e.prenom},${e.nom},${e.dateDebut},${e.communaute},${e.role},${e.initialePrenom},${e.initialeNom}`;
+
                 }).join("\n");
+
                 
-                const content = header + lines;
+
+                const contenu = header + lignes;
+
                 
+
                 triggerUserFileDownload({
-                    content: content,
-                    filename: "alaners_quiz.csv"
+
+                    content: contenu,
+
+                    filename: "100_premiers_alaniens.csv"
+
                 });
+
             }
 
-            // Get a background color for each community
-            function getCommunityColor(community) {
-                const colors = {
-                    "Engineering": "#e6f7ff",
-                    "Sales": "#f6ffed",
-                    "Care": "#fff2e8",
-                    "Data": "#f9f0ff",
-                    "Design and Research": "#fcffe6",
-                    "Product Management": "#fff0f6",
-                    "Operations": "#f0f5ff",
-                    "Marketing": "#fffbe6",
-                    "Insurance": "#e6fffb",
-                    "Business Strategy and Operations": "#fff7e6",
-                    "Corporate": "#f5f5f5",
-                    "Talent": "#e6f7ff",
-                    "People": "#f6ffed",
-                    "Finance": "#fff2e8",
-                    "IT": "#f9f0ff",
-                    "Health practitioners": "#fcffe6",
-                    "Workplace": "#fff0f6",
-                    "Public Affairs": "#f0f5ff",
-                    "Market and Bet Owners": "#fffbe6",
-                    "Co-founders": "#ffcccb",
-                    "Associates": "#e6fffb"
-                };
-                
-                return colors[community] || "#f5f5f5"; // Default color if community not listed
+
+
+            // Modifier le seuil de similarité
+
+            function changerSeuilSimilarite(e) {
+
+                setSeuilSimilarite(parseFloat(e.target.value));
+
             }
 
-            // Change similarity threshold
-            function changeSimilarityThreshold(e) {
-                setSimilarityThreshold(parseFloat(e.target.value));
-            }
 
-            // Display loading message if data is not yet loaded
-            if (!employeesLoaded) {
+
+            // Afficher un message de chargement si les données ne sont pas encore chargées
+
+            if (!employesCharges) {
+
                 return React.createElement(
+
                     "div", 
+
                     { style: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' } },
+
                     React.createElement(
+
                         "div", 
+
                         { style: { fontSize: '1.25rem', color: '#4b5563' } },
-                        "Loading data..."
+
+                        "Chargement des données..."
+
                     )
+
                 );
+
             }
 
-            // Rendering with React.createElement instead of JSX
+
+
+            // Le reste du rendu avec React.createElement au lieu de JSX
+
             return React.createElement(
+
                 "div",
+
                 { 
+
                     style: { 
+
                         maxWidth: '800px', 
+
                         margin: '0 auto', 
+
                         padding: '20px',
+
                         fontFamily: 'Arial, sans-serif'
+
                     }
+
                 },
+
                 [
-                    // Title
+
+                    // Titre
+
                     React.createElement(
+
                         "h1",
+
                         { 
+
                             key: "title",
+
                             style: { 
+
                                 fontSize: '2.5rem', 
+
                                 fontWeight: 'bold', 
+
                                 marginBottom: '1.5rem', 
+
                                 textAlign: 'center',
+
                                 color: 'black'
+
                             }
+
                         },
-                        "Do you really know your fellow Alaners?"
+
+                        "Les 100 premiers Alaniens"
+
                     ),
+
                     
+
                     // Instructions
+
                     React.createElement(
+
                         "div",
+
                         {
+
                             key: "instructions",
+
                             style: {
+
                                 marginBottom: '1.5rem',
+
                                 padding: '1rem',
+
                                 backgroundColor: '#f0f9ff',
+
                                 borderRadius: '0.5rem',
+
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+
                             }
+
                         },
+
                         [
+
                             React.createElement(
+
                                 "h2",
+
                                 {
+
                                     style: { fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }
+
                                 },
-                                "How to play:"
+
+                                "Comment jouer :"
+
                             ),
+
                             React.createElement(
+
                                 "ol",
+
                                 { style: { paddingLeft: '1.5rem' } },
+
                                 [
-                                    React.createElement("li", { key: "instr1" }, "Guess the last name of an employee and type it in the field below"),
+
+                                    React.createElement("li", { key: "instr1" }, "Devinez le nom de famille d'un des 100 premiers employés d'Alan"),
+
                                     React.createElement("li", { key: "instr2" }, [
-                                        React.createElement("strong", null, "5 points"),
-                                        " per name found without hints"
+
+                                        React.createElement("strong", null, "10 points"),
+
+                                        " par nom trouvé sans indice"
+
                                     ]),
+
                                     React.createElement("li", { key: "instr3" }, [
-                                        "Use hint buttons to help you:",
+
+                                        "Utilisez les boutons d'indices pour vous aider :",
+
                                         React.createElement(
+
                                             "ul",
+
                                             { style: { paddingLeft: '1.5rem', marginTop: '0.25rem', listStyleType: 'circle' } },
+
                                             [
+
                                                 React.createElement("li", { key: "hint1" }, [
-                                                    "With 1 hint: ",
-                                                    React.createElement("strong", null, "3 points"),
-                                                    " per name found"
+
+                                                    "Avec 1 indice : ",
+
+                                                    React.createElement("strong", null, "5 points"),
+
+                                                    " par nom trouvé"
+
                                                 ]),
+
                                                 React.createElement("li", { key: "hint2" }, [
-                                                    "With 2 hints: ",
+
+                                                    "Avec 2 indices : ",
+
+                                                    React.createElement("strong", null, "3 points"),
+
+                                                    " par nom trouvé"
+
+                                                ]),
+
+                                                React.createElement("li", { key: "hint3" }, [
+
+                                                    "Avec 3 indices : ",
+
                                                     React.createElement("strong", null, "1 point"),
-                                                    " per name found"
+
+                                                    " par nom trouvé"
+
                                                 ])
+
                                             ]
+
                                         )
+
                                     ]),
-                                    React.createElement("li", { key: "instr4" }, "Approximate spellings are accepted (e.g., \"gooverts\" for \"goovaerts\")"),
+
+                                    React.createElement("li", { key: "instr4" }, "Les orthographes approximatives sont acceptées"),
+
                                     React.createElement("li", { key: "instr5" }, [
-                                        "You have ",
-                                        React.createElement("strong", null, "1 hour"),
-                                        " to find as many names as possible!"
-                                    ]),
-                                    React.createElement("li", { key: "instr6" }, "After 1 hour, all answers will be automatically revealed.")
+
+                                        "Vous avez ",
+
+                                        React.createElement("strong", null, "1 heure"),
+
+                                        " pour trouver un maximum de noms !"
+
+                                    ])
+
                                 ]
+
                             ),
+
                             
-                            !gameStarted && !gameEnded ? React.createElement(
+
+                            !jeuCommence && !jeuTermine ? React.createElement(
+
                                 "div",
+
                                 { style: { textAlign: 'center', marginTop: '1rem' } },
+
                                 React.createElement(
+
                                     "button",
+
                                     {
-                                        onClick: startGame,
+
+                                        onClick: commencerJeu,
+
                                         style: {
+
                                             backgroundColor: '#3b82f6',
+
                                             color: 'white',
+
                                             padding: '0.75rem 1.5rem',
+
                                             borderRadius: '0.375rem',
+
                                             fontWeight: 'bold',
+
                                             fontSize: '1.125rem',
+
                                             border: 'none',
+
                                             cursor: 'pointer',
+
                                             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+
                                         }
+
                                     },
-                                    "Start"
+
+                                    "Commencer"
+
                                 )
+
                             ) : null
+
                         ]
+
                     ),
+
                     
+
                     // Timer
+
                     React.createElement(
+
                         "div",
+
                         {
+
                             key: "timer",
+
                             style: {
+
                                 marginBottom: '1.5rem',
+
                                 padding: '0.75rem',
-                                backgroundColor: gameEnded ? '#fee2e2' : '#f0f9ff',
+
+                                backgroundColor: jeuTermine ? '#fee2e2' : '#f0f9ff',
+
                                 borderRadius: '0.5rem',
+
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+
                                 display: 'flex',
+
                                 justifyContent: 'center',
+
                                 alignItems: 'center',
+
                                 gap: '1rem'
+
                             }
+
                         },
+
                         [
+
                             React.createElement(
+
                                 "div",
+
                                 { 
+
                                     style: { 
+
                                         fontSize: '2rem', 
+
                                         fontWeight: 'bold',
-                                        color: gameEnded ? '#b91c1c' : (timeRemaining < 300 ? '#b91c1c' : '#1e40af')
+
+                                        color: jeuTermine ? '#b91c1c' : (tempsRestant < 300 ? '#b91c1c' : '#1e40af')
+
                                     }
+
                                 },
-                                formatTime(timeRemaining)
+
+                                formaterTemps(tempsRestant)
+
                             ),
+
                             
-                            gameStarted ? React.createElement(
+
+                            jeuCommence ? React.createElement(
+
                                 "div",
+
                                 { 
+
                                     style: { 
+
                                         fontSize: '1rem',
-                                        color: gameEnded ? '#b91c1c' : 'inherit'
+
+                                        color: jeuTermine ? '#b91c1c' : 'inherit'
+
                                     }
+
                                 },
-                                gameEnded ? "Time's up!" : "Time remaining"
+
+                                jeuTermine ? "Temps écoulé !" : "Temps restant"
+
                             ) : null
+
                         ]
+
                     ),
+
                     
-                    // Search form
+
+                    // Formulaire de recherche
+
                     React.createElement(
+
                         "div",
+
                         {
+
                             key: "search-form",
+
                             style: { 
+
                                 marginBottom: '1.5rem', 
+
                                 position: 'sticky', 
+
                                 top: '0', 
+
                                 zIndex: '10', 
+
                                 backgroundColor: 'white', 
+
                                 padding: '10px 0' 
+
                             }
+
                         },
+
                         [
+
                             React.createElement(
+
                                 "form",
+
                                 {
-                                    onSubmit: checkName,
+
+                                    onSubmit: verifierNom,
+
                                     style: { display: 'flex', gap: '0.5rem' }
+
                                 },
+
                                 [
+
                                     React.createElement(
+
                                         "input",
+
                                         {
+
                                             type: "text",
-                                            value: search,
-                                            onChange: function(e) { setSearch(e.target.value); },
-                                            placeholder: "Enter a last name...",
-                                            disabled: !gameStarted || gameEnded,
+
+                                            value: recherche,
+
+                                            onChange: function(e) { setRecherche(e.target.value); },
+
+                                            placeholder: "Entrez un nom de famille...",
+
+                                            disabled: !jeuCommence || jeuTermine,
+
                                             style: { 
+
                                                 flex: '1',
+
                                                 padding: '0.5rem',
+
                                                 border: '1px solid #d1d5db',
+
                                                 borderRadius: '0.375rem',
+
                                                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                                                opacity: (!gameStarted || gameEnded) ? 0.7 : 1
+
+                                                opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1
+
                                             }
+
                                         }
+
                                     ),
+
                                     React.createElement(
+
                                         "button",
+
                                         {
+
                                             type: "submit",
-                                            disabled: !gameStarted || gameEnded,
+
+                                            disabled: !jeuCommence || jeuTermine,
+
                                             style: {
+
                                                 backgroundColor: '#3b82f6',
+
                                                 color: 'white',
+
                                                 padding: '0.5rem 1rem',
+
                                                 borderRadius: '0.375rem',
+
                                                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+
                                                 border: 'none',
+
                                                 cursor: 'pointer',
-                                                opacity: (!gameStarted || gameEnded) ? 0.7 : 1
+
+                                                opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1
+
                                             }
+
                                         },
-                                        "Check"
+
+                                        "Vérifier"
+
                                     )
+
                                 ]
+
                             ),
+
                             
+
                             message ? React.createElement(
+
                                 "div",
+
                                 {
+
                                     style: {
+
                                         marginTop: '0.5rem',
+
                                         padding: '0.5rem',
+
                                         borderRadius: '0.375rem',
-                                        backgroundColor: message.includes('Well done') ? '#dcfce7' : '#f3f4f6',
-                                        color: message.includes('Well done') ? '#166534' : 'inherit'
+
+                                        backgroundColor: message.includes('Bravo') ? '#dcfce7' : '#f3f4f6',
+
+                                        color: message.includes('Bravo') ? '#166534' : 'inherit'
+
                                     }
+
                                 },
+
                                 message
+
                             ) : null
+
                         ]
+
                     ),
+
                     
-                    // Stats and controls
+
+                    // Statistiques et contrôles
+
                     React.createElement(
+
                         "div",
+
                         {
+
                             key: "stats-controls",
+
                             style: {
+
                                 marginBottom: '1rem',
+
                                 padding: '0.75rem',
+
                                 backgroundColor: '#f9fafb',
+
                                 borderRadius: '0.5rem',
+
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+
                                 display: 'flex',
+
                                 flexWrap: 'wrap',
+
                                 justifyContent: 'space-between',
+
                                 alignItems: 'center',
+
                                 gap: '0.75rem'
+
                             }
+
                         },
+
                         [
-                            // Statistics
+
+                            // Statistiques
+
                             React.createElement(
+
                                 "div",
+
                                 { style: { fontWeight: '500' } },
+
                                 [
+
                                     React.createElement(
+
                                         "div",
+
                                         null,
-                                        `Progress: ${stats.discovered} / ${stats.total} employees discovered`
+
+                                        `Progrès : ${stats.decouverts} / ${stats.total} employés découverts`
+
                                     ),
+
                                     React.createElement(
+
                                         "div",
+
                                         { style: { fontSize: '1.125rem', fontWeight: '700' } },
-                                        `Score: ${stats.score} points`
+
+                                        `Score : ${stats.score} points`
+
                                     )
+
                                 ]
+
                             ),
+
                             
-                            // Hint buttons
+
+                            // Boutons d'indices
+
                             React.createElement(
+
                                 "div",
+
                                 { style: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem' } },
+
                                 [
-                                    // Hint: Initials
+
+                                    // Indice : Communauté
+
                                     React.createElement(
+
                                         "button",
+
                                         {
-                                            onClick: function() { toggleHint('initials'); },
-                                            disabled: !gameStarted || gameEnded,
+
+                                            onClick: function() { toggleIndice('communaute'); },
+
+                                            disabled: !jeuCommence || jeuTermine,
+
                                             style: {
+
                                                 padding: '0.25rem 0.75rem',
+
                                                 borderRadius: '0.375rem',
+
                                                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                                                backgroundColor: hintsActive.initials ? '#fef9c3' : '#e5e7eb',
-                                                color: hintsActive.initials ? '#854d0e' : 'inherit',
+
+                                                backgroundColor: indicesActives.communaute ? '#fef9c3' : '#e5e7eb',
+
+                                                color: indicesActives.communaute ? '#854d0e' : 'inherit',
+
                                                 border: 'none',
+
                                                 cursor: 'pointer',
-                                                opacity: (!gameStarted || gameEnded) ? 0.7 : 1
+
+                                                opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1
+
                                             }
+
                                         },
-                                        hintsActive.initials ? 'Hide initials' : 'Hint: Initials'
+
+                                        indicesActives.communaute ? 'Masquer communauté' : 'Indice : Communauté'
+
                                     ),
+
                                     
-                                    // Hint: Name length
+
+                                    // Indice : Rôle
+
                                     React.createElement(
+
                                         "button",
+
                                         {
-                                            onClick: function() { toggleHint('nameLength'); },
-                                            disabled: !gameStarted || gameEnded,
+
+                                            onClick: function() { toggleIndice('role'); },
+
+                                            disabled: !jeuCommence || jeuTermine,
+
                                             style: {
+
                                                 padding: '0.25rem 0.75rem',
+
                                                 borderRadius: '0.375rem',
+
                                                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                                                backgroundColor: hintsActive.nameLength ? '#fef9c3' : '#e5e7eb',
-                                                color: hintsActive.nameLength ? '#854d0e' : 'inherit',
+
+                                                backgroundColor: indicesActives.role ? '#fef9c3' : '#e5e7eb',
+
+                                                color: indicesActives.role ? '#854d0e' : 'inherit',
+
                                                 border: 'none',
+
                                                 cursor: 'pointer',
-                                                opacity: (!gameStarted || gameEnded) ? 0.7 : 1
+
+                                                opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1
+
                                             }
+
                                         },
-                                        hintsActive.nameLength ? 'Hide name length' : 'Hint: Name length'
+
+                                        indicesActives.role ? 'Masquer rôle' : 'Indice : Rôle'
+
+                                    ),
+
+                                    
+
+                                    // Indice : Initiales
+
+                                    React.createElement(
+
+                                        "button",
+
+                                        {
+
+                                            onClick: function() { toggleIndice('initiales'); },
+
+                                            disabled: !jeuCommence || jeuTermine,
+
+                                            style: {
+
+                                                padding: '0.25rem 0.75rem',
+
+                                                borderRadius: '0.375rem',
+
+                                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+
+                                                backgroundColor: indicesActives.initiales ? '#fef9c3' : '#e5e7eb',
+
+                                                color: indicesActives.initiales ? '#854d0e' : 'inherit',
+
+                                                border: 'none',
+
+                                                cursor: 'pointer',
+
+                                                opacity: (!jeuCommence || jeuTermine) ? 0.7 : 1
+
+                                            }
+
+                                        },
+
+                                        indicesActives.initiales ? 'Masquer initiales' : 'Indice : Initiales'
+
                                     )
+
                                 ]
+
                             ),
+
                             
-                            // Controls (buttons and filter)
+
+                            // Contrôles (boutons)
+
                             React.createElement(
+
                                 "div",
+
                                 { style: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem' } },
+
                                 [
-                                    // Community filter
+
+                                    // Bouton réinitialiser/recommencer
+
                                     React.createElement(
-                                        "select",
-                                        {
-                                            value: communityFilter,
-                                            onChange: function(e) { setCommunityFilter(e.target.value); },
-                                            disabled: !gameStarted && !gameEnded,
-                                            style: {
-                                                padding: '0.5rem',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '0.375rem',
-                                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                                                opacity: (!gameStarted && !gameEnded) ? 0.7 : 1
-                                            }
-                                        },
-                                        communities.map(function(comm) {
-                                            return React.createElement("option", { key: comm, value: comm }, comm);
-                                        })
-                                    ),
-                                    
-                                    // Reset/restart button
-                                    React.createElement(
+
                                         "button",
+
                                         {
-                                            onClick: reset,
+
+                                            onClick: reinitialiser,
+
                                             style: {
+
                                                 backgroundColor: '#e5e7eb',
+
                                                 padding: '0.25rem 0.75rem',
+
                                                 borderRadius: '0.375rem',
+
                                                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+
                                                 border: 'none',
+
                                                 cursor: 'pointer'
+
                                             }
+
                                         },
-                                        gameEnded ? "Restart" : "Reset"
+
+                                        jeuTermine ? "Recommencer" : "Réinitialiser"
+
                                     ),
+
                                     
-                                    // Export CSV button
+
+                                    // Bouton exporter CSV
+
                                     React.createElement(
+
                                         "button",
+
                                         {
-                                            onClick: exportCSV,
+
+                                            onClick: exporterCSV,
+
                                             style: {
+
                                                 backgroundColor: '#22c55e',
+
                                                 color: 'white',
+
                                                 padding: '0.25rem 0.75rem',
+
                                                 borderRadius: '0.375rem',
+
                                                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+
                                                 border: 'none',
+
                                                 cursor: 'pointer'
+
                                             }
+
                                         },
-                                        "Export CSV"
+
+                                        "Exporter CSV"
+
                                     )
+
                                 ]
+
                             )
+
                         ]
+
                     ),
+
                     
-                    // Similarity threshold setting
+
+                    // Réglage de la sensibilité
+
                     React.createElement(
+
                         "div",
+
                         {
+
                             key: "sensitivity",
+
                             style: {
+
                                 marginBottom: '1.5rem',
+
                                 padding: '0.75rem',
+
                                 backgroundColor: '#f0f9ff',
+
                                 borderRadius: '0.5rem',
+
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+
                             }
+
                         },
+
                         [
+
                             React.createElement(
+
                                 "div",
+
                                 { style: { marginBottom: '0.5rem', fontWeight: '500' } },
-                                `Matching sensitivity: ${Math.round(similarityThreshold * 100)}%`
+
+                                `Sensibilité de correspondance : ${Math.round(seuilSimilarite * 100)}%`
+
                             ),
+
                             React.createElement(
+
                                 "input",
+
                                 {
+
                                     type: "range",
+
                                     min: "0.5",
+
                                     max: "0.95",
+
                                     step: "0.05",
-                                    value: similarityThreshold,
-                                    onChange: changeSimilarityThreshold,
+
+                                    value: seuilSimilarite,
+
+                                    onChange: changerSeuilSimilarite,
+
                                     style: { width: '100%' }
+
                                 }
+
                             ),
+
                             React.createElement(
+
                                 "div",
+
                                 { style: { display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', color: '#6b7280' } },
+
                                 [
-                                    React.createElement("span", null, "More flexible"),
-                                    React.createElement("span", null, "More strict")
+
+                                    React.createElement("span", null, "Plus flexible"),
+
+                                    React.createElement("span", null, "Plus strict")
+
                                 ]
+
                             )
+
                         ]
+
                     ),
+
                     
-                    // Employees by community
+
+                    // Liste des employés triée par ID
+
                     React.createElement(
+
                         "div",
-                        { 
-                            key: "community-lists",
-                            style: { display: 'flex', flexDirection: 'column', gap: '20px' } 
-                        },
-                        Object.keys(employeesByCommmunity).sort().map(function(community) {
-                            return React.createElement(
-                                "div",
-                                {
-                                    key: community,
-                                    style: {
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '0.5rem',
-                                        overflow: 'hidden',
-                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                                        backgroundColor: getCommunityColor(community)
-                                    }
-                                },
-                                [
-                                    React.createElement(
-                                        "div",
-                                        {
-                                            style: {
-                                                backgroundColor: '#1f2937',
-                                                color: 'white',
-                                                fontWeight: 'bold',
-                                                padding: '0.75rem'
-                                            }
-                                        },
-                                        `${community} (${employeesByCommmunity[community].length})`
-                                    ),
-                                    React.createElement(
-                                        "table",
-                                        { style: { width: '100%', borderCollapse: 'collapse' } },
-                                        [
-                                            React.createElement(
-                                                "thead",
-                                                null,
-                                                React.createElement(
-                                                    "tr",
-                                                    { style: { backgroundColor: 'rgba(255, 255, 255, 0.5)' } },
-                                                    [
-                                                        React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Role"),
-                                                        React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Scope"),
-                                                        React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Start Date"),
-                                                        hintsActive.initials && React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Initials"),
-                                                        hintsActive.nameLength && React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Name Length"),
-                                                        React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Full Name")
-                                                    ].filter(Boolean) // Filter out null elements
-                                                )
-                                            ),
-                                            React.createElement(
-                                                "tbody",
-                                                null,
-                                                employeesByCommmunity[community].map(function(employee, idx) {
-                                                    return React.createElement(
-                                                        "tr",
-                                                        {
-                                                            key: idx,
-                                                            style: { 
-                                                                backgroundColor: idx % 2 === 0 ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)'
-                                                            }
-                                                        },
-                                                        [
-                                                            React.createElement("td", { style: { padding: '0.5rem' } }, employee.role),
-                                                            React.createElement("td", { style: { padding: '0.5rem' } }, employee.scope),
-                                                            React.createElement("td", { style: { padding: '0.5rem' } }, employee.startDate),
-                                                            hintsActive.initials && React.createElement(
-                                                                "td",
-                                                                { style: { padding: '0.5rem' } },
-                                                                `${employee.firstInitial}. ${employee.lastInitial}.`
-                                                            ),
-                                                            hintsActive.nameLength && React.createElement(
-                                                                "td",
-                                                                { style: { padding: '0.5rem' } },
-                                                                `${employee.lastName.length} letters`
-                                                            ),
-                                                            React.createElement(
-                                                                "td",
-                                                                { style: { padding: '0.5rem' } },
-                                                                employee.discovered 
-                                                                    ? React.createElement("span", { style: { fontWeight: '500' } }, `${employee.firstName} ${employee.lastName}`)
-                                                                    : React.createElement("span", { style: { color: '#9ca3af' } }, "● ●")
-                                                            )
-                                                        ].filter(Boolean) // Filter out null elements
-                                                    );
-                                                })
-                                            )
-                                        ]
-                                    )
-                                ]
-                            );
-                        })
-                    ),
-                    
-                    // Game over message
-                    gameEnded && React.createElement(
-                        "div",
+
                         {
-                            key: "game-over",
-                            style: {
-                                margin: '20px 0',
-                                padding: '1rem',
-                                backgroundColor: '#fee2e2',
+
+                            key: "employee-list",
+
+                            style: { 
+
+                                border: '1px solid #e5e7eb',
+
                                 borderRadius: '0.5rem',
-                                textAlign: 'center',
-                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+
+                                overflow: 'hidden',
+
+                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+
+                                backgroundColor: 'white'
+
                             }
+
                         },
+
                         [
+
+                            // Titre
+
                             React.createElement(
-                                "h2",
-                                { style: { fontSize: '1.5rem', fontWeight: 'bold', color: '#b91c1c' } },
-                                "Time's up!"
-                            ),
-                            React.createElement(
-                                "p",
-                                { style: { marginTop: '0.5rem' } },
-                                [
-                                    "You found ",
-                                    React.createElement("strong", null, stats.discovered),
-                                    ` employees out of ${stats.total} and scored `,
-                                    React.createElement("strong", null, stats.score),
-                                    " points."
-                                ]
-                            ),
-                            React.createElement(
-                                "p",
-                                { style: { marginTop: '0.5rem', fontStyle: 'italic' } },
-                                "All answers have been revealed. You can explore the complete list."
-                            ),
-                            React.createElement(
-                                "button",
+
+                                "div",
+
                                 {
-                                    onClick: reset,
+
                                     style: {
-                                        marginTop: '1rem',
-                                        backgroundColor: '#3b82f6',
+
+                                        backgroundColor: '#1f2937',
+
                                         color: 'white',
-                                        padding: '0.5rem 1rem',
-                                        borderRadius: '0.375rem',
+
                                         fontWeight: 'bold',
-                                        border: 'none',
-                                        cursor: 'pointer'
+
+                                        padding: '0.75rem'
+
                                     }
+
                                 },
-                                "Play Again"
+
+                                `Liste des employés (${employes.length})`
+
+                            ),
+
+                            
+
+                            // Tableau des employés
+
+                            React.createElement(
+
+                                "table",
+
+                                { style: { width: '100%', borderCollapse: 'collapse' } },
+
+                                [
+
+                                    // En-tête du tableau
+
+                                    React.createElement(
+
+                                        "thead",
+
+                                        null,
+
+                                        React.createElement(
+
+                                            "tr",
+
+                                            { style: { backgroundColor: 'rgba(243, 244, 246, 0.8)' } },
+
+                                            [
+
+                                                React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "ID"),
+
+                                                React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Date début"),
+
+                                                indicesActives.communaute && React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Communauté"),
+
+                                                indicesActives.role && React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Rôle"),
+
+                                                indicesActives.initiales && React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Initiales"),
+
+                                                React.createElement("th", { style: { padding: '0.5rem', textAlign: 'left' } }, "Nom complet")
+
+                                            ].filter(Boolean) // Filtre les éléments null
+
+                                        )
+
+                                    ),
+
+                                    
+
+                                    // Corps du tableau
+
+                                    React.createElement(
+
+                                        "tbody",
+
+                                        null,
+
+                                        employes.map(function(employe, idx) {
+
+                                            return React.createElement(
+
+                                                "tr",
+
+                                                {
+
+                                                    key: idx,
+
+                                                    style: { 
+
+                                                        backgroundColor: idx % 2 === 0 ? 'white' : 'rgba(249, 250, 251, 0.8)'
+
+                                                    }
+
+                                                },
+
+                                                [
+
+                                                    React.createElement("td", { style: { padding: '0.5rem' } }, employe.id),
+
+                                                    React.createElement("td", { style: { padding: '0.5rem' } }, employe.dateDebut),
+
+                                                    indicesActives.communaute && React.createElement("td", { style: { padding: '0.5rem' } }, employe.communaute),
+
+                                                    indicesActives.role && React.createElement("td", { style: { padding: '0.5rem' } }, employe.role),
+
+                                                    indicesActives.initiales && React.createElement(
+
+                                                        "td",
+
+                                                        { style: { padding: '0.5rem' } },
+
+                                                        `${employe.initialePrenom}. ${employe.initialeNom}.`
+
+                                                    ),
+
+                                                    React.createElement(
+
+                                                        "td",
+
+                                                        { style: { padding: '0.5rem' } },
+
+                                                        employe.decouvert 
+
+                                                            ? React.createElement("span", { style: { fontWeight: '500' } }, `${employe.prenom} ${employe.nom}`)
+
+                                                            : React.createElement("span", { style: { color: '#9ca3af' } }, "● ●")
+
+                                                    )
+
+                                                ].filter(Boolean) // Filtre les éléments null
+
+                                            );
+
+                                        })
+
+                                    )
+
+                                ]
+
                             )
+
                         ]
+
+                    ),
+
+                    
+
+                    // Message de fin de jeu
+
+                    jeuTermine && React.createElement(
+
+                        "div",
+
+                        {
+
+                            key: "game-over",
+
+                            style: {
+
+                                margin: '20px 0',
+
+                                padding: '1rem',
+
+                                backgroundColor: '#fee2e2',
+
+                                borderRadius: '0.5rem',
+
+                                textAlign: 'center',
+
+                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+
+                            }
+
+                        },
+
+                        [
+
+                            React.createElement(
+
+                                "h2",
+
+                                { style: { fontSize: '1.5rem', fontWeight: 'bold', color: '#b91c1c' } },
+
+                                "Temps écoulé !"
+
+                            ),
+
+                            React.createElement(
+
+                                "p",
+
+                                { style: { marginTop: '0.5rem' } },
+
+                                [
+
+                                    "Vous avez trouvé ",
+
+                                    React.createElement("strong", null, stats.decouverts),
+
+                                    ` employés sur ${stats.total} et marqué `,
+
+                                    React.createElement("strong", null, stats.score),
+
+                                    " points."
+
+                                ]
+
+                            ),
+
+                            React.createElement(
+
+                                "p",
+
+                                { style: { marginTop: '0.5rem', fontStyle: 'italic' } },
+
+                                "Toutes les réponses ont été révélées. Vous pouvez explorer la liste complète."
+
+                            ),
+
+                            React.createElement(
+
+                                "button",
+
+                                {
+
+                                    onClick: reinitialiser,
+
+                                    style: {
+
+                                        marginTop: '1rem',
+
+                                        backgroundColor: '#3b82f6',
+
+                                        color: 'white',
+
+                                        padding: '0.5rem 1rem',
+
+                                        borderRadius: '0.375rem',
+
+                                        fontWeight: 'bold',
+
+                                        border: 'none',
+
+                                        cursor: 'pointer'
+
+                                    }
+
+                                },
+
+                                "Rejouer"
+
+                            )
+
+                        ]
+
                     )
+
                 ]
+
             );
+
         }
 
-        // Render the application
+
+
+        // Rendu de l'application
+
         ReactDOM.render(React.createElement(App), document.getElementById('root'));
+
     </script>
+
 </body>
+
 </html>
