@@ -36,331 +36,618 @@
     <script>
         // Destructure necessary React elements
         const { useState, useEffect, useRef } = React;
+// Données complètes des employés
+const donneesBrutes = `FIRST_NAME,LAST_NAME,START_DATE,COMMUNITY,ROLE,SCOPE,"LEFT(FIRST_NAME,1)","LEFT(LAST_NAME,1)"
+Evan,Azoulay,"22 Apr, 2025",Data,Data (Intern),Global,E,A
+Younes,Souffi,"13 Jan, 2025",Marketing,Growth Marketing,Global,Y,S
+Léo,Champion,"19 Jun, 2023",Engineering,Software Engineer,Global,L,C
+Antoine,Moulet,"1 Dec, 2018",Product Management,Product Manager,Global,A,M
+Maxence,Bouret,"21 Oct, 2019",Engineering,Software Engineer,Global,M,B
+Elodie,Burtin,"23 Oct, 2023",Engineering,Software Engineer,Global,E,B
+Lauriane,Tanchou,"16 Oct, 2024",Health practitioners,Optician,Global,L,T
+Julien,Plessis,"4 Jul, 2022",Sales,Account Executive,France,J,P
+Juanjo,Domínguez,"2 Dec, 2024",Sales,Sales Lead,Global,J,D
+Thomas,Bosson,"3 Jun, 2024",Marketing,Field Marketing,Global,T,B
+Hippolyte,Hazard,"18 Dec, 2023",Operations,Ops Builder,Global,H,H
+Beatriz,Rubio,"23 Oct, 2023",Design and Research,Product Designer,Global,B,R
+Thomas,Quinot,"6 Jul, 2020",Corporate,Information security lead / CISO,Global,T,Q
+Julie,Rossi,"18 Nov, 2019",Engineering,Software Engineer,Global,J,R
+Lea,Vallerian,"16 Dec, 2019",Operations,Ops Coordinator,France,L,V
+Jeremy,Sillam,"1 Mar, 2023",Data,Full Stack Data Scientist,Global,J,S
+Olivier,Sambourg,"6 Jun, 2017",Engineering,Software Engineer,Global,O,S
+Sara,Tezenas du Montcel,"24 Feb, 2025",Operations,Ops Coordinator,Global,S,T
+Thibault,Goustat,"23 May, 2022",Operations,Ops Builder,Global,T,G
+Rodrigo,Tico,"18 Jul, 2022",Sales,Account Executive,Spain,R,T
+Audrey,Brimbeuf,"7 Oct, 2024",Sales,Account Manager,France,A,B
+Leslie,Artus,"23 Oct, 2023",Care,User Care Expert,France,L,A
+Juan,Escamilla,"2 Dec, 2024",Sales,Account Executive,Spain,J,E
+Marion,Bechetoille,"18 Nov, 2024",Care,Outsourcing Delivery Specialist,France,M,B
+Ros
+Guillaume,Bessalem,"5 Jul, 2021",Insurance,Insurance Products,France,G,B
+Alexandre,Renault,"3 Jan, 2022",Care,User Care Expert,France,A,R
+Sarah,Decoster,"19 Oct, 2020",Operations,Ops Coordinator,Belgium,S,D
+Jasper,Beirens,"15 May, 2023",Finance,Finance,Global,J,B
+Myriam,Girin,"22 Apr, 2025",Sales,Account Executive,France,M,G
+Théodore,Philipp,"25 Mar, 2024",Sales,Account Executive,France,T,P
+Florian,Gagnadre,"7 Oct, 2019",Engineering,Software Engineer,Global,F,G
+Carlos,Arroyo Macarro,"31 Jul, 2023",Care,User Care Expert,Spain,C,A
+Pau,Palacios Vilajuana,"2 Jan, 2024",Care,Care Crew Lead,Spain,P,P
+Maria Monica,Mendoza Arevalo,"15 Jan, 2024",Sales,Business Development Representative,Spain,M,M
+Emma,Goldblum,"1 Feb, 2021",Engineering,Software Engineer,Global,E,G
+Quentin,Planes,"12 Feb, 2024",Sales,Inbound Sales,France,Q,P
+Racim,Amer Moussa,"6 Jan, 2025",Care,Care Ops,France,R,A
+Magdeleine,Courtois,"16 Jun, 2025",Associates,Founder Associate,Global,M,C
+Yoann,Artus,"12 Aug, 2024",Market and Bet Owners,Unit Lead - Spain,Spain,Y,A
+Vincent,Lambert,"12 Sep, 2022",Operations,Ops Builder,Global,V,L
+Miguel Jesús,García Vázquez,"13 Mar, 2023",Sales,Account Executive,Spain,M,G
+Lea,Vaude,"3 Sep, 2024",Sales,Customer Success Manager,France,L,V
+Gisèle,Seif,"22 Apr, 2025",Care,Outsourcing Delivery Specialist,Global,G,S
+Anaël,Beaugnon,"6 May, 2024",Data,Full Stack Data Scientist,Global,A,B
+Tomas Karin P,Van Zundert,"3 Jan, 2023",Operations,Ops Coordinator,Belgium,T,V
+Georges,Namet,"1 Feb, 2021",Engineering,Software Engineer,Global,G,N
+Aboubakr,Mouline,"10 Feb, 2025",Insurance,Insurance Products,France,A,M
+Benjamin,Dentaud,"21 Jun, 2021",Sales,Account Executive,France,B,D
+Antoine,Destombes,"23 Oct, 2023",Care,User Care Expert,France,A,D
+Azzedine,Daoud,"7 Apr, 2025",Sales,Business Development Representative,France,A,D
+Nikolaos,Metaxas,"31 Mar, 2025",Sales,Account Executive,Global,N,M
+Vincent,Hirsch,"15 Mar, 2021",Public Affairs,Community Lead,Global,V,H
+Maï-thi,Van Cong Trang,"29 Mar, 2021",Care,User Care Expert,France,M,V
+Rémy,Thirot,"21 May, 2024",Sales,Business Development Representative,France,R,T
+Cécile,Defline,"7 Apr, 2025",Sales,Account Executive,France,C,D
+Francesco,Pontrandolfo,"4 Dec, 2023",Product Management,Community Associate,Global,F,P
+Constance,Protais,"25 Sep, 2023",Care,User Care Expert,France,C,P
+Lola,Lecasble,"22 Nov, 2021",Design and Research,User Researcher,Global,L,L
+Ivan,Shestunov,"8 Nov, 2021",Design and Research,Product Designer,Global,I,S
+Marta,Martín Mazaira,"16 Aug, 2023",Health practitioners,Health Practitioner,Spain,M,M
+Victoria,Lainé,"25 Sep, 2023",Marketing,Marketing Acquisition,Global,V,L
+Antoine,Lizee,"9 May, 2016",Data,Full Stack Data Scientist,Global,A,L
+Lieven,Jacquot,"24 Feb, 2025",Engineering,Software Engineer,Global,L,J
+Julien,Chenat,"15 Oct, 2018",Design and Research,Product Designer,Global,J,C
+Alice,Borrego,"12 Aug, 2024",Care,User Care Expert,Spain,A,B
+Anaïs,Persigan,"14 Mar, 2022",Sales,Customer Success Manager,France,A,P
+Aleksandra,Orłowska,"15 Jul, 2024",Talent,Talent,Global,A,O
+Vincent,Brachet,"9 Apr, 2018",Sales,Sales Crew Lead,France,V,B
+Adrien,Sarg,"1 Jul, 2024",Associates,Founder Associate,Global,A,S
+Donatien,Laplace,"6 Apr, 2020",Sales,Account Executive,France,D,L
+Emma,Kleiber,"11 Oct, 2021",Care,Care Crew Lead,France,E,K
+Julie,Pouzols,"28 Mar, 2022",Operations,Ops Builder,Global,J,P
+Mario,Le Bras,"10 Mar, 2025",Marketing,Field Marketing,France,M,L
+Antonin,Changeon,"31 Jul, 2023",Care,User Care Expert,France,A,C
+Hortense,Villeronce,"6 Dec, 2021",Design and Research,User Researcher,Global,H,V
+Nordwin,Hoff,"28 Mar, 2022",Engineering,Software Engineer,Global,N,H
+Estelle,Berdugo,"10 Feb, 2025",Sales,Account Executive,France,E,B
+Steven,Godard,"10 Oct, 2022",Product Management,Product Manager,Global,S,G
+Thibault,Devalle-Predieri,"18 May, 2020",Sales,Account Executive,France,T,D
+Nina,Bliah-Gil,"15 Jul, 2024",Workplace,Workplace Experience,Global,N,B
+Arthur,Raffegeau,"10 Feb, 2025",Insurance,Insurance Products,France,A,R
+Léo,Darriet,"10 Mar, 2025",Design and Research,Product Designer,Global,L,D
+Léa,Lacoste,"2 Dec, 2024",Engineering,Software Engineer,Global,L,L
+Margot,Vanfleteren,"22 Nov, 2021",Care,User Care Expert,Belgium,M,V
+Kevin,Delvecchio,"7 Oct, 2024",Marketing,Brand and Content,Global,K,D
+Ketsia,Mukuna,"7 Oct, 2024",Sales,Inbound Sales,France,K,M
+Guillaume,Bizot,"15 Jan, 2024",Sales,Account Executive,France,G,B
+Céline,Tabary Kern,"11 Sep, 2023",Care,User Care Expert,France,C,T
+Jordan,Kowal,"19 May, 2025",Engineering,Software Engineer,Global,J,K
+Remy-Christophe,Schermesser,"1 Jul, 2019",Engineering,Engineering Unit Referent,Global,R,S
+Pauline,Bouchereau,"22 Apr, 2024",Engineering,Software Engineer,Global,P,B
+Julien,Femia,"13 Feb, 2023",Engineering,Software Engineer,Global,J,F
+Léa,Frehel,"6 Jan, 2025",Sales,Business Development Representative,France,L,F
+Maryline,Gnonlonfoun,"2 Aug, 2021",Care,Customer Support Specialist - Public Sector,France,M,G
+Frederik,Lundqvist,"3 Jan, 2023",Sales,Account Executive,Belgium,F,L
+Eleonore,Adrian,"1 Oct, 2018",Sales,Sales Crew Lead,France,E,A
+Odile,Kusnik,"28 Sep, 2020",Insurance,Insurance Products,Canada,O,K
+Antoine,Bertin,"31 Jan, 2022",Engineering,Software Engineer,Global,A,B
+Aurelien,Cazes,"1 Mar, 2021",Business Strategy and Operations,Sales Strategist,Belgium,A,C
+Loïc,Say,"10 Feb, 2025",Engineering,Software Engineer,Global,L,S
+Eric,Caginicolau,"29 Jan, 2024",Engineering,Software Engineer,Global,E,C
+Johannes,Weck,"24 Mar, 2025",Engineering,Software Engineer,Global,J,W
+Hortense,Drevon,"26 Aug, 2024",Sales,Customer Success Manager,France,H,D
+Chaïmaa,Kadaoui,"1 Mar, 2021",Corporate,Security Engineer,Global,C,K
+Anna,Keroulle,"26 Sep, 2022",Marketing,Brand and Content,Global,A,K
+William,Earp,"9 Nov, 2020",Engineering,Software Engineer,Global,W,E
+Cyril,Vinot,"3 Jul, 2018",Data,Full Stack Data Scientist,Global,C,V
+Valérie,Le Goc,"6 May, 2024",Marketing,Growth Marketing,Global,V,L
+Lucie,Paladino,"7 Oct, 2019",Workplace,Community Lead,Global,L,P
+Noemie,Duneton,"14 Sep, 2020",Associates,Unit Associate,Global,N,D
+Kristina,Rylova,"14 Mar, 2022",Marketing,Product Marketing,Global,K,R
+Thierry,Godfroid,"4 Feb, 2019",Engineering,Software Engineer,Global,T,G
+Louis,Pinget,"25 May, 2021",Care,User Care Expert,France,L,P
+Clothilde,Maurer,"7 Jun, 2021",Talent,Talent Ops,Global,C,M
+Jean Philippe,Aldon,"12 Apr, 2021",Sales,Account Executive,France,J,A
+Cécile,Plateaux,"7 Oct, 2024",Care,User Care Expert,France,C,P
+Cecile,Raque,"30 Aug, 2021",Sales,Tender Manager,France,C,R
+David,Barthelemy,"9 May, 2022",Engineering,Software Engineer,Global,D,B
+Francesca,Vogliotti,"3 Jan, 2023",Business Strategy and Operations,Sales Strategist,Global,F,V
+Celine,Brunel,"22 Nov, 2021",Design and Research,Product Designer,Global,C,B
+Victor,Dancette,"1 Apr, 2019",Sales,Sales Crew Lead,France,V,D
+Gregoire,Roussel,"6 Apr, 2020",Sales,Account Executive,France,G,R
+Jeremie,Preault,"30 Aug, 2021",Workplace,Workplace Experience,Global,J,P
+Romain,Stourm,"6 Apr, 2020",Sales,Sales Crew Lead,France,R,S
+Mickael,Eymauzy,"25 Apr, 2022",Sales,Account Executive,France,M,E
+Perrine,Pullicino,"28 Aug, 2023",Engineering,Software Engineer,Global,P,P
+Camille,Belmokadem,"2 Jan, 2024",Sales,Business Development Representative,France,C,B
+Isabel,Belmonte Alfaro,"7 Apr, 2025",Sales,Account Manager,Spain,I,B
+Thomas,Repichet,"2 Sep, 2019",Sales,Sales Crew Lead,France,T,R
+Jonathan,Kuek,"13 Jan, 2025",Engineering,Software Engineer,Global,J,K
+Gaspard,Le Hebel,"3 Jan, 2024",Associates,Community Associate,Global,G,L
+François-Regis,Sinot,"1 Feb, 2021",Engineering,Software Engineer,Global,F,S
+Rocio Florencia,Fariña Paredes,"11 Mar, 2024",Sales,Business Development Representative,Spain,R,F
+Edern,Poisson,"12 Feb, 2024",Operations,Ops Coordinator,Global,E,P
+Laura,Maes,"25 Mar, 2024",Sales,Sales Associate,Belgium,L,M
+Maxime,Robinet,"4 May, 2020",Design and Research,Product Designer,Global,M,R
+Jibril,Kechidi,"11 Apr, 2022",Sales,Account Executive,France,J,K
+Margot,Debure,"2 Aug, 2021",Care,Care Hiring Specialist,France,M,D
+Louis,Daisomont,"9 Sep, 2024",Engineering,Software Engineer,Global,L,D
+Marie,Humblet Vertongen,"25 Mar, 2024",Operations,Ops Builder,Global,M,H
+Stanislas,Larget-Piet,"16 Dec, 2024",Associates,Unit Associate,Global,S,L
+Alexis,Bertholon,"28 Feb, 2022",Talent,Talent,Global,A,B
+Vincent,Rialland,"27 Jan, 2025",Engineering,Software Engineer,Global,V,R
+Maxime,Le Bras,"7 Dec, 2020",Talent,Community Lead,Global,M,L
+Alexandre,Azria,"23 Jul, 2024",Design and Research,Community Associate,Global,A,A
+Hugo,de La Marlier de La Sauverie,"25 Mar, 2024",Insurance,Insurance Business,France,H,d
+Florian,Ernst,"3 Jan, 2022",Data,Full Stack Dataery Alejandra,Garcia Avendaño,"13 Feb, 2023",Care,User Care Expert,Spain,V,G
+Margaux,Forget,"11 Sep, 2023",Data,Full Stack Data Scientist,Global,M,F
+Xavier,Seignard,"7 Jun, 2021",Engineering,Software Engineer,Global,X,S
+Elodie,Erwitt,"15 Jul, 2024",Engineering,Software Engineer,Global,E,E
+Juan Pablo,Briceno,"7 Oct, 2024",Associates,Founder Associate,Global,J,B
+Moritz,Zilian,"7 Nov, 2022",Engineering,Software Engineer,Global,M,Z
+Lea,Barbaroux,"26 Oct, 2020",Sales,Sales Crew Lead,France,L,B
+Theo,Dammaretz,"15 Mar, 2021",Engineering,Software Engineer,Global,T,D
+Aymeric,Frys,"8 Apr, 2024",Sales,Business Development Representative,France,A,F
+Josephine,Gaillet,"28 Sep, 2020",Care,Care Ops,France,J,G
+Julie,Vertenten,"14 Mar, 2022",Sales,Account Executive,Belgium,J,V
+Brent,Carels,"24 Mar, 2025",Sales,Account Executive,Belgium,B,C
+Paloma,Albo Domene,"11 Mar, 2024",Operations,Ops Coordinator,Spain,P,A
+Robin,Rettien,"10 Feb, 2025",Engineering,Software Engineer,Global,R,R
+Andrea,Peftuloglu,"24 Apr, 2023",Care,User Care Expert,Global,A,P
+Diane,Teste,"5 Jun, 2023",Sales,Business Development Representative,France,D,T
+Anne-Claire,Ho Si,"6 Dec, 2021",Engineering,Software Engineer,Global,A,H
+Lucy,Lavielle,"27 Feb, 2023",Sales,Customer Success Manager,France,L,L
+Emmanuelle,Lacaille,"28 Feb, 2022",Sales,Account Executive,France,E,L
+Margaux,Macioce Lischewski,"16 Aug, 2022",Business Strategy and Operations,Business Segment Lead,Global,M,M
+Maria Luisa,Freitas Correia,"13 Sep, 2021",Operations,Ops Builder,Global,M,F
+Thanh Van Laura,Tran Binh,"13 Mar, 2023",Business Strategy and Operations,Sales Strategist,Global,T,T
+Alexis,Wallon,"26 Aug, 2024",Corporate,Risk,Global,A,W
+Magali,Richard,"10 Mar, 2025",Health practitioners,Community Lead,Global,M,R
+Tan,Cetiner,"24 Feb, 2025",Engineering,Software Engineer,Global,T,C
+Marion,Cosson,"4 Jan, 2021",Operations,Ops Builder,Global,M,C
+Freddy,Guitton,"9 Sep, 2024",Engineering,Software Engineer,Global,F,G
+Tim,Petricola,"28 Oct, 2019",Engineering,Software Engineer,Global,T,P
+Thomas,Humeau,"27 Feb, 2023",Data,Full Stack Data Scientist,Global,T,H
+Juliette,Raimbault,"2 Dec, 2019",People,Community Lead,Global,J,R
+Aurian,Le Clercq,"24 Mar, 2025",Sales,Account Executive,France,A,L
+Guillaume,Durand,"9 Sep, 2024",Marketing,Product Marketing,Global,G,D
+Antoine,Baudoin,"23 Sep, 2024",Care,User Care Expert,France,A,B
+Aïcha,CHEKKAL,"2 Jan, 2024",Care,User Care Expert,France,A,C
+David,Mattatia,"29 Aug, 2022",Sales,Pre-Sales Specialist,France,D,M
+Antoine,Kahn-Dubois,"12 Sep, 2022",Engineering,Software Engineer,Global,A,K
+Charles,Follet,"23 Oct, 2023",Engineering,Software Engineer,Global,C,F
+Thomas,Mollard,"20 May, 2019",Engineering,Software Engineer,Global,T,M
+Sophie,Lobel,"27 Sep, 2021",Care,User Care Expert,Belgium,S,L
+Christelle,Mozzati,"14 and Research,Product Designer,Global,C,M
+Laura,Gasparini,"17 Jan, 2022",Design and Research,User Researcher,Global,L,G
+Mark,Rogal,"6 Jan, 2025",Operations,Ops Builder,Global,M,R
+Francisco Javier,Alemán Sánchez,"12 Sep, 2022",Talent,Talent,Global,F,A
+Marvyn,Leroy,"19 Jun, 2023",Engineering,Software Engineer,Global,M,L
+Brecht,Verhamme,"4 May, 2020",Operations,Ops Builder,Global,B,V
+Raphaëlle,Robert-Mourey,"26 Aug, 2024",Operations,Ops Builder,Global,R,R
+Manon,Stanguennec,"7 Oct, 2024",Operations,Ops Coordinator,Global,M,S
+Nathan,Trompet,"2 Dec, 2024",Sales,Inbound Sales,Belgium,N,T
+Marion,Bergeret,"15 Jun, 2020",Corporate,Corporate Lead,Global,M,B
+Chloe,Pont,"16 Aug, 2022",Data,Full Stack Data Scientist,Global,C,P
+Grace,Healy,"6 Jan, 2025",Care,User Care Expert,Global,G,H
+Berangere,Giraud,"21 Nov, 2018",Care,Customer Support Specialist - Entreprise,France,B,G
+Sebastien,Phlix,"9 Nov, 2020",Product Management,Product Manager,Spain,S,P
+Dries,Stevens,"28 Sep, 2020",Sales,Sales Lead,Belgium,D,S
+Mathieu,Tanré,"3 Feb, 2025",Associates,Founder Associate,Global,M,T
+Melanie,Alsberghe,"21 Apr, 2022",Product Management,Product Manager,Global,M,A
+Clement,Mennesson,"4 Jun, 2018",Product Management,Product Manager,Global,C,M
+Sarah,Louahem,"25 Mar, 2024",Engineering,Software Engineer,Global,S,L
+Simon,Despretz,"25 May, 2021",Sales,Account Executive,France,S,D
+Remi,Schockmel,"1 Jul, 2019",Sales,Sales Crew Lead,France,R,S
+Lucile,Beranger,"9 Sep, 2024",Care,User Care Expert,France,L,B
+Amélie,Massieu,"20 Nov, 2023",Care,User Care Expert,France,A,M
+Simon,Plard,"28 Mar, 2022",Sales,Business Development Representative,France,S,P
+Joséphine,Collin,"11 Sep, 2023",Marketing,Product Marketing,Global,J,C
+Flavie,de The,"17 Jun, 2019",Data,Full Stack Data Scientist,Global,F,d
+Arthur,Ecoffet,"10 Oct, 2022",Data,Full Stack Data Scientist,Global,A,E
+Mallaury,Schmidt,"8 Nov, 2021",Operations,Ops Coordinator,France,M,S
+Yann,Callens,"7 Jun, 2022",Sales,Account Executive,France,Y,C
+Ariane,Bayat,"15 Apr, 2019",Sales,Sales Crew Lead,France,A,B
+Marie,Giffard,"15 Jul, 2024",Care,User Care Expert,France,M,G
+Laetitia,Bordier,"29 Aug, 2022",Talent,Talent,Global,L,B
+Coline,Brousseau,"15 Jan, 2024",Sales,Pre-Sales Specialist,France,C,B
+Aurelie,Fliedel,"31 Aug, 2020",Marketing,Community Lead,Global,A,F
+Syrine,Burget,"9 Sep, 2024",Operations,Ops Coordinator,Global,S,B
+Xavier,Puyau,"30 Aug, 2021",Sales,Sales Crew Lead,France,X,P
+Cécile,Bedu,"16 Jan, 2023",Marketing,Product Marketing,Global,C,B
+Gerhard,Schaumann,"13 Jan, 2025",Health practitioners,Health Practitioner,Global,G,S
+Lisa,De Pauw,"19 Dec, 2022",Care,User Care Expert,Belgium,L,D
+Augustin,Mine,"7 Jan, 2019",Market and Bet Owners,Community Lead,France,A,M
+Fanette,Lopez,"19 Aug, 2019",Care,Knowledge Specialist,France,F,L
+Augustin,Feraud,"17 Jun, 2024",Sales,Account Executive,France,A,F
+Lotte,Bijlsma,"14 Mar, 2022",Design and Research,Product Designer,Global,L,B
+Fabienne,Bremond,"28 Aug, 2023",Engineering,Software Engineer,Global,F,B
+Mohamed Ghazi,Benabid,"18 May, 2020",Business Strategy and Operations,Sales Strategist,Global,M,B
+Samy,Nouchy,"7 Jun, 2021",Sales,Account Executive,France,S,N
+Celia,Barthel,"25 Apr, 2022",Data,Full Stack Data Scientist,Global,C,B
+Quentin,Barbarat,"15 Feb, 2021",Engineering,Software Engineer,Global,Q,B
+Maria,Cvitkovic,"19 Jul, 2021",People,People Ops,Global,M,C
+Adrien,Albert,"7 Jun, 2021",Marketing,Customer Marketing,Global,A,A
+Ariane,Delanoue,"6 Jan, 2025",Sales,Business Development Representative,France,A,D
+Zsolt,Horváth,"2 Jan, 2024",Engineering,Software Engineer,Global,Z,H
+Julie,Boyer,"28 Jul, 2025",Insurance,Risk,Global,J,B
+Chiara,Marcelo,"6 Feb, 2023",People,People Ops,Global,C,M
+Soline,Pulicani,"13 Sep, 2021",Sales,Account Executive,France,S,P
+Simon,Verlaque,"15 Jun, 2020",Business Strategy and Operations,Sales Strategist,Global,S,V
+Pablo,Martínez Pérez,"17 Jun, 2024",Engineering,Software Engineer,Spain,P,M
+Valentin,Mourtialon,"21 Oct, 2024",Engineering,Software Engineer,Global,V,M
+Alice,Mortier,"2 Jan, 2023",Marketing,Community Associate,Global,A,M
+Vincent,Poulain,"15 Jun, 2020",Engineering,Software Engineer,Global,V,P
+Flora,Ganther,"29 Mar, 2021",Design and Research,Product Designer,Global,F,G
+Lea,Sander,"7 Jun, 2022",Sales,Account Manager,France,L,S
+Etienne,Moreau,"12 Sep, 2022",Care,Customer Support Specialist - Public Sector,France,E,M
+Bruno,Vegreville,"26 Sep, 2022",Product Management,Product Manager,Global,B,V
+Félicie,Martens,"25 Sep, 2023",Sales,Customer Success Manager,France,F,M
+Guillaume,Maarek,"9 Oct, 2023",Product Management,Product Manager,Global,G,M
+Marion,Laouadi,"9 May, 2022",Marketing,Product Marketing,Global,M,L
+Lydia,Martin,"22 Apr, 2022",Health practitioners,Health Practitioner,Global,L,M
+Maxime,Auvy,"9 Oct, 2023",Corporate,Security Engineer,Global,M,A
+Caroline,Boudard,"3 Feb, 2020",Care,Product Specialist,France,C,B
+Anastasia,Melnichenko,"17 Feb, 2020",Design and Research,Product Designer,Global,A,M
+Matthieu,Stombellini,"25 Sep, 2023",Engineering,Software Engineer,Global,M,S
+Osanne,Le cavorsin,"23 Sep, 2024",Sales,Account Executive,France,O,L
+Alix,Vermeulen,"9 Sep, 2024",Data,Full Stack Data Scientist,Global,A,V
+Bastien,Landre,"9 Sep, 2024",Engineering,Software Engineer,Global,B,L
+Eva,Michon,"24 Oct, 2022",Care,Care Crew Lead,Belgium,E,M
+Alexandre,Nasr,"10 Mar, 2025",Data,Full Stack Data Scientist,Global,A,N
+Charles,Gorintin,"1 Jan, 2016",Co-founders,CTO,Global,C,G
+Victoire,Bartholoni,"3 Jan, 2022",Sales,Account Executive,France,V,B
+Alfredo,Schoch,"31 Aug, 2020",Operations,Ops Builder,Global,A,S
+Anne-Caroline,Rérolle,"16 Jan, 2023",Data,Full Stack Data Scientist,Global,A,R
+Laurane,Maitrel,"8 Oct, 2018",Product Management,Product Manager,Global,L,M
+Thomas,Moreaux Chassé,"6 Nov, 2023",Engineering,Software Engineer,Global,T,M
+Maeva-Lucile,Trautsch,"25 Apr, 2022",Care,Product Specialist,France,M,T
+Maarten,Mampaey,"21 May, 2024",Product Management,Product Manager,Global,M,M
+Charlène,Adam,"17 Jan, 2022",Sales,Account Executive,France,C,A
+Camilla,Kasparek,"13 Sep, 2021",Talent,Talent,Global,C,K
+Clemence,Collon,"19 Aug, 2019",Operations,Ops Coordinator,Global,C,C
+John-Michaël,To,"2 Jan, 2024",Engineering,Software Engineer,Global,J,T
+Simon,Treny,"7 Dec, 2020",Engineering,Software Engineer,Global,S,T
+Marie,Hardel,"2 Jul, 2018",Care,Community Lead,Global,M,H
+Maxime,Faidherbe,"3 Jan, 2022",Operations,Ops Builder,Global,M,F
+Anne-Laure,Caralp,"11 Sep, 2023",Marketing,Brand and Content,Global,A,C
+Theo,Sermet,"17 Aug, 2020",Insurance,Insurance Products,France,T,S
+Nils,Prételat,"26 Aug, 2024",Marketing,Field Marketing,France,N,P
+Emilie,Quellec,"4 May, 2020",Sales,Account Executive,France,E,Q
+Kamilia,Bouraoui-Karoui,"21 Nov, 2022",Business Strategy and Operations,CRM manager,Global,K,B
+Mariane,Schueller,"10 Mar, 2025",Business Strategy and Operations,Sales Strategist,Global,M,S
+Aude,Vantyghem,"17 Jan, 2022",People,People Ops,Global,A,V
+Claudia,Roguet,"1 Jul, 2024",Care,User Care Expert,France,C,R
+Lucie,Louvet,"22 Nov, 2021",Care,Care Crew Lead,France,L,L
+Edgar,Anagnostou,"26 Feb, 2024",Marketing,Field Marketing,Global,E,A
+Caroline,Jeangeorges,"23 Nov, 2020",Data,Full Stack Data Scientist,Global,C,J
+Pierre-Adrien,Oudenot,"31 Jan, 2022",Business Strategy and Operations,Sales Strategist,Global,P,O
+Elsa,Delpech,"2 Dec, 2024",Care,User Care Expert,France,E,D
+Louis,Beauval,"10 Feb, 2025",Insurance,Insurance Products,France,L,B
+Timna,Ehrmann,"4 May, 2020",Data,Full Stack Data Scientist,Global,T,E
+Clement,Varin,"14 Mar, 2022",Sales,Inbound Sales,France,C,V
+Guillermo,Duran,"5 Jul, 2021",Sales,Business Development Representative,Spain,G,D
+Louis,Rapin,"19 Jun, 2023",Sales,Customer Success Manager,France,L,R
+Elise,Toureau,"25 Oct, 2021",Corporate,Legal Counsel,Global,E,T
+Romain,Picabea,"4 Jul, 2022",Insurance,Risk,Global,R,P
+Laura,Schwab Revah,"26 Feb, 2024",Sales,Account Manager,France,L,S
+Charlotte,Baudet,"8 Nov, 2021",Operations,Ops Builder,Global,C,B
+Lise,Doublet,"30 Aug, 2021",Care,User Care Expert,France,L,D
+Clement,Dauchy,"29 Mar, 2021",Sales,Account Executive,France,C,D
+Marine,Huber,"22 Apr, 2024",Product Management,Growth Product Manager,Global,M,H
+Igor,Gonzalez Aberasturi,"13 Jan, 2025",Care,User Care Expert,Spain,I,G
+Amandine,Desfachelle,"3 Jan, 2022",Care,Care Crew Lead,France,A,D
+Hana,Meskine,"28 Mar, 2022",Insurance,Insurance Products,France,H,M
+Charles,Dusser,"1 Jul, 2019",Business Strategy and Operations,Community Lead,Global,C,D
+Oscar,Magaldi,"10 Mar, 2025",Operations,Ops Builder,Global,O,M
+Jacob,Batist,"10 Feb, 2025",Marketing,Marketing Acquisition,Global,J,B
+Matthias,Roy,"14 Mar, 2022",Sales,Account Executive,France,M,R
+Emilie,Gueble,"14 Mar, 2022",People,People Ops,Global,E,G
+Mathieu,Ghaleb,"1 Jun, 2020",Engineering,Software Engineer,Global,M,G
+Romain,Lods,"12 Apr, 2021",Engineering,Software Engineer,Global,R,L
+Stephane,Soulier,"20 May, 2019",Data,Full Stack Data Scientist,Global,S,S
+Aurélie,Van Houte,"27 Mar, 2023",Sales,Account Executive,Belgium,A,V
+Chloe,Legrand,"12 Nov, 2018",Care,Care Ops,France,C,L
+Lisa,Spector,"11 Sep, 2023",Health practitioners,Health Practitioner,Global,L,S
+Sonny,Wouters,"4 Nov, 2024",Sales,Account Manager,Belgium,S,W
+Laure,Bonnefoi,"16 Dec, 2019",Care,Product Specialist,France,L,B
+Gilbert,Tchoi,"7 Dec, 2020",Engineering,Software Engineer,Global,G,T
+Louis,Godquin,"24 Apr, 2023",Sales,Inbound Sales,France,L,G
+Wassim,Hassine,"30 Jan, 2023",Sales,Account Executive,France,W,H
+James,Whitbeck,"4 Sep, 2017",Engineering,Software Engineer,Global,J,W
+Emilie,Vanopbrocke,"25 May, 2021",Sales,Account Executive,France,E,V
+Jonathan,Orban,"15 Mar, 2021",Product Management,Product Manager,Canada,J,O
+Tifenn,Boni,"11 Oct, 2021",Business Strategy and Operations,Sales Enabler,Global,T,B
+Alice,Boudhors,"13 Jan, 2025",People,People Ops,Global,A,B
+Jules,Poulet,"26 Sep, 2022",Care,User Care Expert,Belgium,J,P
+Ellen,Verleyen,"15 Feb, 2021",Design and Research,Product Designer,Global,E,V
+Anaïs,Clog,"15 Feb, 2021",Care,Customer Support Specialist - Public Sector,France,A,C
+Marcos,Alfaro,"13 Jan, 2025",Sales,Account Executive,Spain,M,A
+Corentin,Vaillant,"25 Mar, 2024",Sales,Account Executive,France,C,V
+Beatriz,Peñalver Miranda,"16 Jan, 2023",Care,User Care Expert,Spain,B,P
+Yassmine,Boudili,"7 Apr, 2025",Engineering,Software Engineer,Global,Y,B
+Oriana,Bedreddine,"23 Oct, 2023",Care,User Care Expert,France,O,B
+Alexandre,Dubreuil,"7 Dec, 2020",Engineering,Software Engineer,Global,A,D
+Olivia,Mai,"1 Feb, 2021",Insurance,Insurance Products,Spain,O,M
+Lucie,Aunis,"11 Sep, 2023",Sales,Account Executive,France,L,A
+Leo,Andres,"8 Jan, 2018",Care,Care Crew Lead,France,L,A
+Marie-Helene,Stoltz,"18 May, 2020",Business Strategy and Operations,CRM manager,Global,M,S
+Mark,Goad,"15 Jan, 2024",Market and Bet Owners,Unit Lead - Canada,Canada,M,G
+Toon,Roge,"18 Jul, 2022",Insurance,Insurance Products,Belgium,T,R
+Lorraine,Petitdemange,"4 Sep, 2024",Sales,Account Manager,France,L,P
+Anaïs,Chiem,"14 Feb, 2022",Corporate,Corporate Operations,Global,A,C
+Lucía,Muñiz Bris,"12 Feb, 2024",Sales,Business Development Representative,Spain,L,M
+Remy,Safar,"6 Jan, 2025",Sales,Account Executive,France,R,S
+Marie,Dufour,"12 Feb, 2024",Sales,Account Executive,France,M,D
+Nawal,Laslaa,"29N,L
+Juliette,Lugan,"16 Jun, 2025",Sales,Account Executive,France,J,L
+Marie,Stévens,"28 Aug, 2023",Marketing,Customer Marketing,Belgium,M,S
+Diego,Sanchez,"15 Feb, 2021",Sales,Sales Crew Lead,Spain,D,S
+Estelle,Tire,"22 Nov, 2021",Care,User Care Expert,France,E,T
+Camille,Pire,"3 Jun, 2024",Engineering,Software Engineer,Global,C,P
+Julian,Tolosa,"21 Jun, 2021",Care,User Care Expert,Spain,J,T
+François,Robichet,"16 Jun, 2025",Engineering,Software Engineer,Global,F,R
+Nicolas,Pollie,"6 May, 2024",Sales,Account Executive,Belgium,N,P
+Alexandre,Coget,"14 Mar, 2022",Sales,Account Executive,Belgium,A,C
+Ludovic,Bauple,"20 Nov, 2019",Sales,Revenue Lead,Global,L,B
+Cassandra,Horiszny,"23 May, 2022",Sales,Account Executive,France,C,H
+Cyril,Chapellier,"11 Apr, 2022",Engineering,Software Engineer,Global,C,C
+Ford,Spencer,"6 May, 2024",Design and Research,Graphic & Motion Designer,Global,F,S
+Florent,Neuville,"24 Apr, 2023",Business Strategy and Operations,Business Segment Lead,Global,F,N
+Maelle,Le Du,"28 Feb, 2022",Sales,Account Executive,France,M,L
+Marion,Diemer,"16 Jan, 2023",Care,Customer Support Specialist - Entreprise,France,M,D
+Charlie,Mermillod,"13 Mar, 2023",Sales,Account Executive,France,C,M
+Leonard,Fiehl,"6 Jan, 2025",Associates,Founder Associate,Global,L,F
+Coralie,Lucas,"14 Mar, 2022",Care,Customer Support Specialist - Public Sector,France,C,L
+Pauline,Deleuze,"5 Jul, 2021",Workplace,Workplace Experience,Global,P,D
+Loïc,Favaron,"12 Feb, 2024",Sales,Account Executive,France,L,F
+Sophie,Robert,"7 Jun, 2021",Marketing,Field Marketing,France,S,R
+Guillaume,Poirier,"21 Nov, 2022",Care,Care Ops,France,G,P
+Marie,Terpin,"7 Oct, 2024",Care,User Care Expert,France,M,T
+Alix,Boyer de La Giroday,"26 Aug, 2024",Associates,Founder Associate,Global,A,B
+Marie-Line,Dhooge,"23 May, 2022",Sales,Account Manager,Belgium,M,D
+François,Zannotti,"31 Jan, 2022",Corporate,Legal Counsel,Global,F,Z
+Megane,Kerres,"7 Jun, 2022",Sales,Account Executive,Belgium,M,K
+Maryline,Lefebvre,"16 Dec, 2019",Operations,Ops Coordinator,France,M,L
+Pierre,Martin,"24 Mar, 2025",Sales,Account Manager,France,P,M
+Aurélien,Baelde,"9 Sep, 2024",Data,Full Stack Data Scientist,Global,A,B
+Olivia,Ullmann,"15 Jan, 2024",Sales,Sales Crew Lead,France,O,U
+Laetitia,Lamotte,"2 Dec, 2024",Sales,Customer Success Manager,France,L,L
+Paul,Sauveplane,"20 Jun, 2016",Market and Bet Owners,Alaner Experience Lead,Global,P,S
+Chloé,Petit,"14 Aug, 2023",Marketing,Product Marketing,Global,C,P
+Romain,Richard,"7 Oct, 2024",Business Strategy and Operations,Marketing Ops,Global,R,R
+Maylis,Ullenbruch,"1 Feb, 2021",Sales,Account Executive,France,M,U
+François,Verdier,"10 Mar, 2025",Associates,Founder Associate,Global,F,V
+Manon,Brunel,"31 Jul, 2023",Care,Customer Support Specialist - Entreprise,France,M,B
+Julien,Arzul,"22 Apr, 2024",Engineering,Software Engineer,Global,J,A
+Clelia,Pavanetto,"11",Design and Research,Product Content Manager,Global,C,P
+Romain,Lazzarotto,"26 Aug, 2024",Sales,Pre-Sales Specialist,France,R,L
+Lucas,Picot,"11 Apr, 2023",Data,Full Stack Data Scientist,Global,L,P
+Naomie,Fondin,"25 Sep, 2023",Sales,Account Executive,France,N,F
+Paulo,Gemelgo,"6 May, 2019",Insurance,Insurance Business,France,P,G
+Stef,Hamerlinck,"14 Feb, 2022",Marketing,Brand and Content,Global,S,H
+Jean,Barloy,"14 Jan, 2019",Engineering,Software Engineer,Global,J,B
+Christopher,Coles,"2 Jun, 2025",Engineering,Software Engineer,Global,C,C
+Robert,Zyskowski,"23 May, 2016",Engineering,Software Engineer,Global,R,Z
+Peter,Mason,"26 Aug, 2024",Associates,Founder Associate,Global,P,M
+Ladislas,Berthe,"13 Jan, 2025",Insurance,Insurance Business,France,L,B
+Frederic,Ngo,"9 Sep, 2024",Finance,Finance,Global,F,N
+Carlos Felipe,Gonzalez,"14 Mar, 2022",Sales,Business Development Representative,Spain,C,G
+Manou,Van de Walle,"23 May, 2022",Sales,Account Executive,Belgium,M,V
+Tibo,Ghoos,"1 Jul, 2024",Operations,Ops Builder,Global,T,G
+Mariana,Dinu,"25 Mar, 2024",Sales,Account Manager,France,M,D
+Florian,Bouchot,"17 Jan, 2022",Engineering,Software Engineer,Global,F,B
+Virgile,Mermet,"9 May, 2023",Data,Full Stack Data Scientist,Global,V,M
+Charles,Husquin,"16 Jun, 2025",Engineering,Software Engineer,Global,C,H
+Sixtine,Tranie,"22 Nov, 2021",Operations,Ops Builder,Global,S,T
+Oriane,Lallemand,"6 Jan, 2025",Care,Care Ops,France,O,L
+Roxane,Guilhou,"26 Apr, 2021",Sales,Sales Crew Lead,France,R,G
+Michael,Philippart de Foy,"23 May, 2022",Business Strategy and Operations,Business Segment Lead,Global,M,P
+Tristan,du Boys,"20 Jul, 2020",Operations,Ops Coordinator,Global,T,d
+Sebastien,Fredeau,"14 Sep, 2020",Market and Bet Owners,Unit Lead - Belgium,Belgium,S,F
+Tanguy,Saint-Leger,"24 Mar, 2025",Business Strategy and Operations,Business Segment Lead,Global,T,S
+Philip,Bogaers,"2 Dec, 2024",Sales,Account Executive,Belgium,P,B
+Tanguy,Alefsen de Boisredon,"8 Jul, 2024",Associates,Founder Associate,Global,T,A
+Mathieu,Di Lenardo,"10 Apr, 2023",Sales,Account Executive,France,M,D
+Julie,Meunier,"27 Jan, 2025",Insurance,Insurance Products,France,J,M
+Lucie,Touchais,"4 Nov, 2019",People,People Growth,Global,L,T
+Estelle,Robert-Apesteguy,"26 Aug, 2024",Sales,Business Development Representative,France,E,R
+Ophélia,Maudet,"3 Jul, 2023",Sales,Inbound Sales,France,O,M
+Alienor,Dore,"11 Oct, 2021",Marketing,Marketing Acquisition,Global,A,D
+Fanni,Halmai,"6 Jan, 2025",Engineering,Software Engineer,Global,F,H
+Bo,Smet,"22 Apr, 2024",Design and Research,Product Designer,Global,B,S
+Niels,Huybrechts,"17 Mar, 2025",Sales,Account Executive,Belgium,N,H
+Vineeta,Janmeda,"24 Mar, 2025",Marketing,Marketing Acquisition,Global,V,J
+Camille,Leflour,"1 Jul, 2024",Corporate,Legal Counsel,Global,C,L
+Alexandre,Desbiez,"10 Feb, 2025",Engineering,Software Engineer,Global,A,D
+Mathieu,Rombouts,"31 Jul, 2023",Sales,Account Executive,Belgium,M,R
+Fabrice,Staad,"1 Aug, 2016",Market and Bet Owners,Unit Lead - France,France,F,S
+Alexandre,Gerlic,"16 Sep, 2019",Engineering,Community Lead,Global,A,G
+Xavier,Mathieu,"1 Jul, 2024",Care,Customer Support Specialist - Public Sector,France,X,M
+Lorraine,Pipart,"16 Sep, 2019",Operations,Ops Coordinator,France,L,P
+Lorin,Anthonis,"12 Apr, 2021",Sales,Account Executive,Belgium,L,A
+Cecile,Guirauden,"21 Nov, 2022",Business Strategy and Operations,Sales Strategist,France,C,G
+Patrick,von Glehn,"13 Mar, 2023",Data,Full Stack Data Scientist,Global,P,v
+Melissa,Garcia Garcia,"26 Feb, 2024",Design and Research,Brand Designer,Global,M,G
+Ana,Álvarez-Requejo Heredero,"10 Mar, 2025",Sales,Business Development Representative,Spain,A,Á
+Claire,Lenfant-Kodia,"3 Jan, 2022",Engineering,Software Engineer,Global,C,L
+Adil,Chaudhry,"29 Mar, 2021",Insurance,Insurance Products,France,A,C
+Paloma,Artuñedo Nieto,"1 Apr, 2024",Sales,Account Executive,Spain,P,A
+Padma Aiswarya,Kolisetty,"10 May, 2021",Design and Research,Product Designer,Global,P,K
+Laurent,Thevenin,"30 Aug, 2021",Sales,Account Executive,France,L,T
+Sarah,Meyer,"23 Sep, 2024",Care,User Care Expert,France,S,M
+Nicolas,Zermati,"26 Oct, 2020",Engineering,Software Engineer,Global,N,Z
+Juliette,Monnier,"10 Mar, 2025",Associates,Founder Associate,Global,J,M
+Pol,Blet,"4 Sep, 2024",Sales,Account Manager,France,P,B
+Ujala,Anis,"20 Jan, 2020",Design and Research,Community Lead,Global,U,A
+Pierre-Auguste,Beaucote,"31 Aug, 2020",Health practitioners,Health Practitioner,Global,P,B
+Dylan,Leon,"24 Mar, 2025",Engineering,Software Engineer,Global,D,L
+Kevin,Aserraf,"6 Mar, 2017",Marketing,Product Marketing,Global,K,A
+Wilhelmiina Patricia,Sjöblom,"22 Apr, 2024",Operations,Ops Coordinator,Global,W,S
+Philippine,Grisard,"11 Mar, 2024",Care,Care Ops,France,P,G
+Raphaël,Gruber,"5 May, 2025",Insurance,Insurance Products,Global,R,G
+Laurent,de Marcelier de Gaujac,"9 Sep, 2024",Data,Full Stack Data Scientist,Global,L,d
+Zuriñe,Martin,"4 Dec, 2023",Marketing,Growth Marketing,Spain,Z,M
+Thibaut,Caillierez,"25 Mar, 2024",Engineering,Software Engineer,Global,T,C
+Laure,Boutmy,"4 Jan, 2021",Design and Research,UI Designer,Global,L,B
+Thomas,Ribera,"15 Jul, 2024",Care,User Care Expert,France,T,R
+Xochitl,Florimont,"15 Jul, 2024",Design and Research,Graphic & Motion Designer,Global,X,F
+Sandra,May,"19 Jul, 2021",Talent,Talent,France,S,M
+Kylie,Harris,"6 Nov, 2023",Engineering,Software Engineer,Global,K,H
+Thomas,Rolf,"18 Jun, 2018",Product Management,Community Lead,Global,T,R
+Charles,De Berdt,"22 Apr, 2025",Sales,Account Manager,Belgium,C,D
+Marta,de Camps Junoy,"13 Jan, 2025",Sales,Account Executive,Spain,M,d
+Roee,Avnon,"5 Jun, 2023",Engineering,Software Engineer,Global,R,A
+David,Merckle,"7 Oct, 2019",Engineering,Engineering Unit Referent,Global,D,M
+Emilie,Tasté,"2 Dec, 2024",Sales,Account Executive,France,E,T
+Anne-Victoire,Armstrong,"16 Aug, 2023",Care,Security and Legal Specialist,France,A,A
+Joachim,Lis,"1 Feb, 2025",Design and Research,Community Associate,Global,J,L
+Alba,Sánchez Rodríguez,"13 Jan, 2025",Engineering,Software Engineer,Spain,A,S
+Caroline,Carre,"2 Dec, 2019",Care,Care Crew Lead,France,C,C
+Carole,Chambon,"24 Apr, 2023",Sales,Account Manager,France,C,C
+Laurent,Guerin,"15 Jun, 2020",Insurance,Community Lead,Global,L,G
+Thomas,Dudouet,"3 Feb, 2020",Engineering,Software Engineer,Global,T,D
+Valentine,Abbar,"18 Jul, 2022",Operations,Ops Coordinator,Belgium,V,A
+Emma,Lecomte,"14 Mar, 2022",Product Management,Product Manager,Global,E,L
+Aude,Chevalier,"15 Jan, 2024",Care,Outsourcing Delivery Specialist,France,A,C
+Graziella,Blanchet,"2 Jun, 2025",Sales,Pre-Sales Specialist,France,G,B
+Hakim,Essabar,"10 May, 2021",Sales,Sales Crew Lead,France,H,E
+Maëlys,Guiral,"9 Oct, 2023",Operations,Ops Coordinator,Global,M,G
+Olympe,Bensahel-Mercier,"13 Feb, 2023",Sales,Account Executive,France,O,B
+Frederic,Bonnet,"10 Oct, 2022",Engineering,Software Engineer,Global,F,B
+Arielle,Rakoto Andrianarivelo,"9 May, 2023",Sales,Inbound Sales,France,A,R
+Romain,Cochet,"11 Sep, 2023",Sales,Account Manager,France,R,C
+Arnaud,Spanneut,"15 Feb, 2021",Engineering,Software Engineer,Global,A,S
+Julien,Tanghe,"22 Jul, 2024",Engineering,Software Engineer,Global,J,T
+Lynn,Vermeulen,"6 Jan, 2025",Sales,Account Executive,Belgium,L,V
+Cedric,Goovaerts,"29 Mar, 2021",Insurance,Insurance Products,Belgium,C,G
+Maxime,Droy,"1 Aug, 2022",Engineering,Software Engineer,Global,M,D
+Jorge,Buzzo,"26 Apr, 2021",Sales,Account Executive,Spain,J,B
+Naïm,Smutz,"22 Oct, 2018",Care,Product Specialist,France,N,S
+Othman,Moumni Abdou,"13 Feb, 2023",Engineering,Software Engineer,Global,O,M
+Kevin,Yu,"10 Feb, 2025",Engineering,Software Engineer,Global,K,Y
+Lola,Toledano,"2 Dec, 2024",Finance,Finance Ops,Global,L,T
+Guillaume,Nevoux,"1 Jul, 2019",Care,User Care Expert,France,G,N
+Celine,Chu,"7 Jun, 2022",Talent,Talent,Global,C,C
+Mireya,Grizon Ruiz,"16 Aug, 2021",Care,User Care Expert,Spain,M,G
+Virgile,Faury,"29 Mar, 2021",Sales,Account Executive,France,V,F
+Anatole,Juge,"22 May, 2023",Engineering,Software Engineer,Global,A,J
+Raphaël,Ronot,"20 Nov, 2023",Design and Research,Product Designer,Global,R,R
+Manfredi,Bernardi,"27 Jan, 2025",Associates,Founder Associate,Global,M,B
+Elody,Testud,"27 Jan, 2025",Operations,Ops Coordinator,Global,E,T
+Laurie,Delpino,"6 Nov, 2023",Care,User Care Expert,France,L,D
+Roxanne,Callaert,"19 Dec, 2022",Care,User Care Expert,Belgium,R,C
+Léna,Le Gouill,"29 Jan, 2024",Operations,Ops Coordinator,Global,L,L
+Arthur,Brossollet,"26 Apr, 2021",Sales,Account Executive,France,A,B
+Andries,Verweyen,"15 Jan, 2024",Sales,Account Executive,Belgium,A,V
+Léa,Vitally,"7 Apr, 2025",Care,Customer Support Specialist,France,L,V
+Guillaume,Mohr,"13 Mar, 2023",Data,Full Stack Data Scientist,Global,G,M
+Armony,Magin,"2 Dec, 2024",Care,User Care Expert,France,A,M
+Jean-Charles,Samuelian,"1 Jan, 2016",Co-founders,CEO,Global,J,S
+Raphael,de Menthiere,"12 Apr, 2021",Sales,Sales Crew Lead,France,R,d
+Morgane,Pothimah,"4 Sep, 2024",Workplace,Workplace Experience,Global,M,P
+Sandra,Platano,"24 Mar, 2025",Operations,Ops Builder,Global,S,P
+Wouter,Van Eenoo,"27 Sep, 2021",Sales,Account Executive,Belgium,W,V
+Emeline,Meyohas,"3 Jan, 2022",Care,User Care Expert,France,E,M
+Marion,Doumeingts,"1 Oct, 2018",Design and Research,Product Designer,Global,M,D
+Victor,Boutin,"1 Jun, 2020",Sales,Account Executive,France,V,B
+Cody,Démont,"13 Mar, 2,D
+Lara,Hinedi,"6 Jan, 2025",Operations,Ops Coordinator,Global,L,H
+Adrien,Le Gall,"13 Jan, 2025",Engineering,Software Engineer,Global,A,L
+Alice,Mahoney,"1 Oct, 2019",Product Management,Product Manager,Global,A,M
+Aloïs,Veteau,"1 Jul, 2024",Care,Customer Support Specialist - Public Sector,France,A,V
+Kelly,Marie-Angelique,"16 Aug, 2023",Care,User Care Expert,France,K,M
+Dries,Van den Brande,"1 Feb, 2021",Marketing,Marketing Lead,Belgium,D,V
+Tristan,Tham,"18 Jan, 2021",Sales,Sales Crew Lead,France,T,T
+Anne-Lise,Delfanne,"28 Feb, 2022",Corporate,Legal Counsel,Global,A,D
+Damien,Krotkine,"15 Mar, 2021",Engineering,Software Engineer,Global,D,K
+Gabrielle,Prat,"13 Sep, 2021",Data,Full Stack Data Scientist,Global,G,P
+Gaelle,Boblin,"9 May, 2022",Insurance,Insurance Business,France,G,B
+Nelly,Estruch,"12 Feb, 2024",Care,User Care Expert,Spain,N,E
+Morgane,Macé,"27 Jan, 2025",Sales,Account Manager,France,M,M
+Alice,Tellenne,"24 Apr, 2023",Sales,Account Manager,France,A,T
+Adrien,De Sede,"4 Nov, 2024",Engineering,Software Engineer,Global,A,D
+Astrid,Dousselaere,"24 Feb, 2025",Operations,Ops Coordinator,Global,A,D
+Julia,Zaidat,"25 Mar, 2024",Sales,Account Manager,France,J,Z
+Paul,Desgrees du Lou,"26 Apr, 2021",Sales,Account Executive,France,P,D
+Jill,Tipton,"7 Dec, 2020",Design and Research,User Researcher,Global,J,T
+Diogo Oom Alves,Cardoso,"31 Jan, 2022",Operations,Ops Builder,Global,D,C
+Heloïse,Poras,"4 Nov, 2019",Operations,Ops Coordinator,Global,H,P
+Simon,Perre,"15 Jul, 2019",Operations,Ops Builder,Global,S,P
+Tony,Sanchez,"11 Apr, 2022",Engineering,Software Engineer,Global,T,S
+Julia,Marquette,"9 May, 2023",Marketing,Brand and Content,Global,J,M
+Jules,Gautier,"11 Sep, 2023",Care,User Care Expert,France,J,G
+Mihaela,Albu,"12 Nov, 2018",Finance,Community Lead,Global,M,A
+Robin,Rampaer,"15 Jul, 2024",Product Management,Product Manager,Global,R,R
+Félix,Vianey,"11 Mar, 2024",Care,Care Ops,France,F,V
+Aya,Esaki,"23 Sep, 2024",Data,Full Stack Data Scientist,Global,A,E
+David,Rousselie,"31 Aug, 2020",Engineering,Software Engineer,Global,D,R
+Maria,Lopez,"1 Aug, 2022",Design and Research,User Researcher,Global,M,L
+Damien,Berseron,"10 Oct, 2022",Engineering,Software Engineer,Global,D,B
+Nadege,Michel,"15 Mar, 2021",Engineering,Software Engineer,Global,N,M
+Charles,Chaintreau,"27 Sep, 2021",Care,Technical Support,France,C,C
+Vincent,Perrot,"21 Oct, 2019",Operations,Ops Coordinator,France,V,P
+Ann-Sophie,Van Camp,"27 Mar, 2023",Sales,Account Executive,Belgium,A,V
+Patoin,Zougmore,"4 Jan, 2021",Engineering,Software Engineer,Global,P,Z
+Marine,Ronger,"23 May, 2022",Sales,Account Executive,France,M,R
+Claire,Lacroix,"1 Apr, 2019",Operations,Ops Coordinator,France,C,L
+Lucie,Leflour,"29 Oct, 2018",Sales,Sales Lead,France,L,L
+Léa,Ladisa,"9 May, 2023",Care,User Care Expert,France,L,L
+Thomas,Porez,"4 May, 2020",Data,Full Stack Data Scientist,Global,T,P
+Youssef,El Ouard,"11 Sep, 2023",Data,Full Stack Data Scientist,Global,Y,E
+Victor,Pisula,"9 Oct, 2023",Sales,Business Development Representative,France,V,P
+Aude-Line,Picard,"6 Jan, 2025",Sales,Business Development Representative,France,A,P
+Guillaume,Gustin,"12 Apr, 2021",Engineering,Software Engineer,Global,G,G
+Maxence,Damon,"20 Nov, 2023",Care,User Care Expert,France,M,D
+Gauthier,Ritter,"7 Oct, 2024",Care,User Care Expert,France,G,R
+Félicien,Guilbaud,"9 Sep, 2024",Corporate,Internal Audit,Global,F,G
+Antonin,Laporte,"10 Mar, 2025",Sales,Inbound Sales,France,A,L
+Pablo,Duteil,"10 Feb, 2025",Marketing,Marketing (intern),Global,P,D
+Julien,Durand,"1 Jul, 2024",Product Management,Product Manager,Global,J,D
+Eléonore,Lafonta,"22 Apr, 2025",Operations,Ops Builder,Global,E,L
+Sophie,Bussieres Cauberghs,"4 Nov, 2019",Operations,Community Lead,Global,S,B
+Ricardo,Pallas Roman,"31 Jul, 2023",Engineering,Software Engineer,Spain,R,P
+Jean,Saglio,"11 Mar, 2024",Engineering,Software Engineer,Global,J,S
+Laurene,Loubere,"12 Sep, 2022",Operations,Ops Coordinator,Global,L,L
+Naomi,Fagla Medegan,"15 Jul, 2024",Care,User Care Expert,France,N,F
+Robin,Drouche,"22 Nov, 2021",IT,IT Ops Specialist,Global,R,D
+Laetitia,Lefebvre-Nare,"1 Feb, 2021",Operations,Ops Builder,Global,L,L
+Josephine,Brault Scaillet,"12 Sep, 2022",Sales,Account Executive,France,J,B
+Diala,Youssevitch,"1 Jul, 2024",Sales,Account Executive,France,D,Y
+Antoine,Piguet,"28 Sep, 2020",Data,Full Stack Data Scientist,Global,A,P
+Gautier,Chrétien,"15 Jan, 2024",Sales,Account Executive,France,G,C
+Thibault,Jauffret,"18 Jan, 2021",Sales,Account Executive,France,T,J
+Adele,Johann,"7 Dec, 2020",Care,User Care Expert,France,A,J
+Benoît,Prioux,"1 Feb, 2021",Engineering,Software Engineer,Global,B,P
+Zorana,Ratkovic,"17 Jan, 2022",Data,Full Stack Data Scientist,Global,Z,R
+Johanna,Dupin,"9 Oct, 2023",Sales,Business Development Representative,France,J,D
+David,López,"26 Feb, 2024",Sales,Account Executive,Spain,D,L
+Mickaël,Bergem,"31 Aug, 2020",Engineering,Software Engineer,Global,M,B
+Gregoire,Lambert,"1 Aug, 2022",Product Management,Product Manager,Global,G,L
+Manon,Trabuc,"7 Oct, 2019",People,People Ops,Global,M,T
+Maximilian,Quick,"14 Mar, 2022",Sales,Sales Crew Lead,Belgium,M,Q
+Marc,Faget,"2 Mar, 2020",Finance,Finance,Global,M,F
+Arnaud,Buisson,"23 Nov, 2020",Data,Full Stack Data Scientist,Global,A,B
+Clément,Chabut,"15 Jan, 2024",Sales,Account Manager,France,C,C
+Nicolas,Fortin,"9 Nov, 2020",Engineering,Software Engineer,Global,N,F
+Axel,Nemeth,"24 Mar, 2025",Design and Research,Product Designer,Global,A,N
+Camille,Ginoux,"30 Jan, 2023",Sales,Sales Crew Lead,France,C,G
+Bruna,Hamori,"6 Jan, 2025",Operations,Ops Coordinator,Global,B,H
+Kenza,Aboudrar,"16 Aug, 2021",Operations,Ops Builder,Global,K,A
+Robin,Devaux,"28 Aug, 2023",Sales,Business Development Representative,France,R,D
+Clément,Hermier,"17 Jul, 2023",Business Strategy and Operations,Sales Strategist,Global,C,H
+Romain,Braun,"9 Sep, 2024",Engineering,Software Engineer,Global,R,B
+Margaux,Dereux,"16 May, 2022",Operations,Ops Builder,France,M,D
+Aurélie,De Faria,"5 Jun, 2023",Care,User Care Expert,France,A,D
+Pierre,Steiger,"15 Jan, 2024",Finance,Finance,Global,P,S
+Gwen,Bogaert,"10 Feb, 2025",Engineering,Software Engineer,Global,G,B`;
 
-        // Complete employee data
-        const donneesBrutes = `FIRST_NAME,LAST_NAME,START_DATE,SCOPE,ROLE,COMMUNITY,FIRST_LETTER_FIRST_NAME,FIRST_LETTER_LAST_NAME
-Moritz,Zilian,7 Nov 2022,Global,Software Engineer,Engineering,M,Z
-Lea,Barbaroux,26 Oct 2020,France,Sales Crew Lead,Sales,L,B
-Xavier,Seignard,7 Jun 2021,Global,Software Engineer,Engineering,X,S
-Florian,Ernst,3 Jan 2022,Global,Full Stack Data Scientist,Data,F,E
-Caroline,Boudard,3 Feb 2020,France,Product Specialist,Care,C,B
-Lydia,Martin,22 Apr 2022,Global,Health Practitioner,Health practitioners,L,M
-Bruno,Vegreville,26 Sep 2022,Global,Product Manager,Product Management,B,V
-Etienne,Moreau,12 Sep 2022,France,Customer Support Specialist - Public Sector,Care,E,M
-Flora,Ganther,29 Mar 2021,Global,Product Designer,Design and Research,F,G
-Marion,Laouadi,9 May 2022,Global,Product Marketing,Marketing,M,L
-Lea,Sander,7 Jun 2022,France,Account Manager,Sales,L,S
-David,Rousselie,31 Aug 2020,Global,Software Engineer,Engineering,D,R
-Maria,Lopez,1 Aug 2022,Global,User Researcher,Design and Research,M,L
-Damien,Berseron,10 Oct 2022,Global,Software Engineer,Engineering,D,B
-Thomas,Porez,4 May 2020,Global,Full Stack Data Scientist,Data,T,P
-Guillaume,Gustin,12 Apr 2021,Global,Software Engineer,Engineering,G,G
-Tristan,du Boys,20 Jul 2020,Global,Ops Coordinator,Operations,T,d
-Sebastien,Fredeau,14 Sep 2020,Belgium,Unit Lead - Belgium,Market and Bet Owners,S,F
-Roxane,Guilhou,26 Apr 2021,France,Sales Crew Lead,Sales,R,G
-Michael,Philippart de Foy,23 May 2022,Global,Business Segment Lead,Business Strategy and Operations,M,P
-Simon,Verlaque,15 Jun 2020,Global,Sales Strategist,Business Strategy and Operations,S,V
-Vincent,Poulain,15 Jun 2020,Global,Software Engineer,Engineering,V,P
-Antoine,Moulet,1 Dec 2018,Global,Product Manager,Product Management,A,M
-Cassandra,Horiszny,23 May 2022,France,Account Executive,Sales,C,H
-Ludovic,Bauple,20 Nov 2019,Global,Revenue Lead,Sales,L,B
-Cyril,Chapellier,11 Apr 2022,Global,Software Engineer,Engineering,C,C
-Alexandre,Coget,14 Mar 2022,Belgium,Account Executive,Sales,A,C
-Marion,Deneuville,14 Sep 2020,Global,Product Manager,Product Management,M,D
-Jessica,Robyn de Suys,31 Jan 2022,Belgium,Ops Coordinator,Operations,J,R
-Clement,Sixdenier,7 Oct 2019,France,Account Manager,Sales,C,S
-Audrey,Lourenço,1 Mar 2021,France,Customer Support Specialist - Public Sector,Care,A,L
-Veronique,Pochart,8 Nov 2021,Global,Product Manager,Product Management,V,P
-Fanny,Cibot,29 Mar 2021,France,Account Executive,Sales,F,C
-Paul,Sauveplane,20 Jun 2016,Global,Alaner Experience Lead,Market and Bet Owners,P,S
-Amandine,Desfachelle,3 Jan 2022,France,Care Crew Lead,Care,A,D
-Hana,Meskine,28 Mar 2022,France,Insurance Products,Insurance,H,M
-Lise,Doublet,30 Aug 2021,France,User Care Expert,Care,L,D
-Charles,Dusser,1 Jul 2019,Global,Community Lead,Business Strategy and Operations,C,D
-Clement,Dauchy,29 Mar 2021,France,Account Executive,Sales,C,D
-Camilla,Kasparek,13 Sep 2021,Global,Talent,Talent,C,K
-Laurane,Maitrel,8 Oct 2018,Global,Product Manager,Product Management,L,M
-Alfredo,Schoch,31 Aug 2020,Global,Ops Builder,Operations,A,S
-Maeva-Lucile,Trautsch,25 Apr 2022,France,Product Specialist,Care,M,T
-Victoire,Bartholoni,3 Jan 2022,France,Account Executive,Sales,V,B
-Charlène,Adam,17 Jan 2022,France,Account Executive,Sales,C,A
-Carme,Carboneras,21 Jun 2021,Spain,User Care Expert,Care,C,C
-Caroline,Jeangeorges,23 Nov 2020,Global,Full Stack Data Scientist,Data,C,J
-Pierre-Adrien,Oudenot,31 Jan 2022,Global,Sales Strategist,Business Strategy and Operations,P,O
-Lucie,Louvet,22 Nov 2021,France,Care Crew Lead,Care,L,L
-Clothilde,Maurer,7 Jun 2021,Global,Talent Ops,Talent,C,M
-Louis,Pinget,25 May 2021,France,User Care Expert,Care,L,P
-Thierry,Godfroid,4 Feb 2019,Global,Software Engineer,Engineering,T,G
-Cecile,Raque,30 Aug 2021,France,Tender Manager,Sales,C,R
-Jean Philippe,Aldon,12 Apr 2021,France,Account Executive,Sales,J,A
-Kristina,Rylova,14 Mar 2022,Global,Product Marketing,Marketing,K,R
-François-Regis,Sinot,1 Feb 2021,Global,Software Engineer,Engineering,F,S
-Patoin,Zougmore,4 Jan 2021,Global,Software Engineer,Engineering,P,Z
-Lucie,Leflour,29 Oct 2018,France,Sales Lead,Sales,L,L
-Claire,Lacroix,1 Apr 2019,France,Ops Coordinator,Operations,C,L
-Vincent,Perrot,21 Oct 2019,France,Ops Coordinator,Operations,V,P
-Nadege,Michel,15 Mar 2021,Global,Software Engineer,Engineering,N,M
-Marine,Ronger,23 May 2022,France,Account Executive,Sales,M,R
-Charles,Chaintreau,27 Sep 2021,France,Technical Support,Care,C,C
-Simon,Treny,7 Dec 2020,Global,Software Engineer,Engineering,S,T
-Marie,Hardel,2 Jul 2018,Global,Community Lead,Care,M,H
-Maxime,Faidherbe,3 Jan 2022,Global,Ops Builder,Operations,M,F
-Clemence,Collon,19 Aug 2019,Global,Ops Coordinator,Operations,C,C
-Marc,Faget,2 Mar 2020,Global,Finance,Finance,M,F
-Nicolas,Fortin,9 Nov 2020,Global,Software Engineer,Engineering,N,F
-Mickaël,Bergem,31 Aug 2020,Global,Software Engineer,Engineering,M,B
-Manon,Trabuc,7 Oct 2019,Global,People Ops,People,M,T
-Gregoire,Lambert,1 Aug 2022,Global,Product Manager,Product Management,G,L
-Maximilian,Quick,14 Mar 2022,Belgium,Sales Crew Lead,Sales,M,Q
-Arnaud,Buisson,23 Nov 2020,Global,Full Stack Data Scientist,Data,A,B
-Anne-Claire,Ho Si,6 Dec 2021,Global,Software Engineer,Engineering,A,H
-Arthur,Brossollet,26 Apr 2021,France,Account Executive,Sales,A,B
-Julian,Tolosa,21 Jun 2021,Spain,User Care Expert,Care,J,T
-Estelle,Tire,22 Nov 2021,France,User Care Expert,Care,E,T
-Donatien,Laplace,6 Apr 2020,France,Account Executive,Sales,D,L
-Hortense,Villeronce,6 Dec 2021,Global,User Researcher,Design and Research,H,V
-Julie,Pouzols,28 Mar 2022,Global,Ops Builder,Operations,J,P
-Emma,Kleiber,11 Oct 2021,France,Care Crew Lead,Care,E,K
-Steven,Godard,10 Oct 2022,Global,Product Manager,Product Management,S,G
-Nordwin,Hoff,28 Mar 2022,Global,Software Engineer,Engineering,N,H
-Thibault,Devalle-Predieri,18 May 2020,France,Account Executive,Sales,T,D
-Romain,Lods,12 Apr 2021,Global,Software Engineer,Engineering,R,L
-Gilbert,Tchoi,7 Dec 2020,Global,Software Engineer,Engineering,G,T
-Stephane,Soulier,20 May 2019,Global,Full Stack Data Scientist,Data,S,S
-Chloe,Legrand,12 Nov 2018,France,Care Ops,Care,C,L
-Laure,Bonnefoi,16 Dec 2019,France,Product Specialist,Care,L,B
-Lucie,Touchais,4 Nov 2019,Global,People Growth,People,L,T
-Alienor,Dore,11 Oct 2021,Global,Marketing Acquisition,Marketing,A,D
-Damien,Krotkine,15 Mar 2021,Global,Software Engineer,Engineering,D,K
-Tristan,Tham,18 Jan 2021,France,Sales Crew Lead,Sales,T,T
-Anne-Lise,Delfanne,28 Feb 2022,Global,Legal Counsel,Corporate,A,D
-Dries,Van den Brande,1 Feb 2021,Belgium,Marketing Lead,Marketing,D,V
-Gabrielle,Prat,13 Sep 2021,Global,Full Stack Data Scientist,Data,G,P
-Gaelle,Boblin,9 May 2022,France,Insurance Business,Insurance,G,B
-Tim,Petricola,28 Oct 2019,Global,Software Engineer,Engineering,T,P
-Juliette,Raimbault,2 Dec 2019,Global,Community Lead,People,J,R
-Romain,Picabea,4 Jul 2022,Global,Risk,Insurance,R,P
-Charlotte,Baudet,8 Nov 2021,Global,Ops Builder,Operations,C,B
-Guillermo,Duran,5 Jul 2021,Spain,Business Development Representative,Sales,G,D
-Elise,Toureau,25 Oct 2021,Global,Legal Counsel,Corporate,E,T
-Timna,Ehrmann,4 May 2020,Global,Full Stack Data Scientist,Data,T,E
-Clement,Varin,14 Mar 2022,France,Inbound Sales,Sales,C,V
-Marion,Bergeret,15 Jun 2020,Global,Corporate Lead,Corporate,M,B
-Berangere,Giraud,21 Nov 2018,France,Customer Support Specialist - Entreprise,Care,B,G
-Chloe,Pont,16 Aug 2022,Global,Full Stack Data Scientist,Data,C,P
-Pierre-Yves,Caneill,2 Sep 2019,Global,Software Engineer,Engineering,P,C
-Arnaud,Pioli,10 Oct 2022,Global,Ops Builder,Operations,A,P
-Tiphaine,Gillet,1 Mar 2021,Global,Brand Designer,Design and Research,T,G
-Jocelyn Luz Andrea,Romero Sandoval,1 Aug 2022,Global,Finance Ops,Finance,J,R
-Victor,Boutin,1 Jun 2020,France,Account Executive,Sales,V,B
-Alice,Mahoney,1 Oct 2019,Global,Product Manager,Product Management,A,M
-Remy-Christophe,Schermesser,1 Jul 2019,Global,Engineering Unit Referent,Engineering,R,S
-Benoît,Prioux,1 Feb 2021,Global,Software Engineer,Engineering,B,P
-Josephine,Brault Scaillet,12 Sep 2022,France,Account Executive,Sales,J,B
-Adele,Johann,7 Dec 2020,France,User Care Expert,Care,A,J
-Thibault,Jauffret,18 Jan 2021,France,Account Executive,Sales,T,J
-Laetitia,Lefebvre-Nare,1 Feb 2021,Global,Ops Builder,Operations,L,L
-Antoine,Piguet,28 Sep 2020,Global,Full Stack Data Scientist,Data,A,P
-Zorana,Ratkovic,17 Jan 2022,Global,Full Stack Data Scientist,Data,Z,R
-Robin,Drouche,22 Nov 2021,Global,IT Ops Specialist,IT,R,D
-Guillaume,Poirier,21 Nov 2022,France,Care Ops,Care,G,P
-Maelle,Le Du,28 Feb 2022,France,Account Executive,Sales,M,L
-Sophie,Robert,7 Jun 2021,France,Field Marketing,Marketing,S,R
-Coralie,Lucas,14 Mar 2022,France,Customer Support Specialist - Public Sector,Care,C,L
-Pauline,Deleuze,5 Jul 2021,Global,Workplace Experience,Workplace,P,D
-Maryline,Gnonlonfoun,2 Aug 2021,France,Customer Support Specialist - Public Sector,Care,M,G
-James,Whitbeck,4 Sep 2017,Global,Software Engineer,Engineering,J,W
-Sophie,Bussieres Cauberghs,4 Nov 2019,Global,Community Lead,Operations,S,B
-Maxime,Droy,1 Aug 2022,Global,Software Engineer,Engineering,M,D
-Cedric,Goovaerts,29 Mar 2021,Belgium,Insurance Products,Insurance,C,G
-Roxanne,Callaert,19 Dec 2022,Belgium,User Care Expert,Care,R,C
-Margaux,Macioce Lischewski,16 Aug 2022,Global,Business Segment Lead,Business Strategy and Operations,M,M
-Emmanuelle,Lacaille,28 Feb 2022,France,Account Executive,Sales,E,L
-Maria Luisa,Freitas Correia,13 Sep 2021,Global,Ops Builder,Operations,M,F
-Sixtine,Tranie,22 Nov 2021,Global,Ops Builder,Operations,S,T
-Florian,Bouchot,17 Jan 2022,Global,Software Engineer,Engineering,F,B
-Anaïs,Chiem,14 Feb 2022,Global,Corporate Operations,Corporate,A,C
-Toon,Roge,18 Jul 2022,Belgium,Insurance Products,Insurance,T,R
-Marie-Helene,Stoltz,18 May 2020,Global,CRM manager,Business Strategy and Operations,M,S
-Marion,Doumeingts,1 Oct 2018,Global,Product Designer,Design and Research,M,D
-Emeline,Meyohas,3 Jan 2022,France,User Care Expert,Care,E,M
-Raphael,de Menthiere,12 Apr 2021,France,Sales Crew Lead,Sales,R,d
-Wouter,Van Eenoo,27 Sep 2021,Belgium,Account Executive,Sales,W,V
-Jean-Charles,Samuelian,1 Jan 2016,Global,CEO,Co-founders,J,S
-Quentin,Barbarat,15 Feb 2021,Global,Software Engineer,Engineering,Q,B
-Maria,Cvitkovic,19 Jul 2021,Global,People Ops,People,M,C
-Adrien,Albert,7 Jun 2021,Global,Customer Marketing,Marketing,A,A
-David,Mattatia,29 Aug 2022,France,Pre-Sales Specialist,Sales,D,M
-Antoine,Kahn-Dubois,12 Sep 2022,Global,Software Engineer,Engineering,A,K
-Gregoire,Roussel,6 Apr 2020,France,Account Executive,Sales,G,R
-David,Barthelemy,9 May 2022,Global,Software Engineer,Engineering,D,B
-Jeremie,Preault,30 Aug 2021,Global,Workplace Experience,Workplace,J,P
-Celine,Brunel,22 Nov 2021,Global,Product Designer,Design and Research,C,B
-Victor,Dancette,1 Apr 2019,France,Sales Crew Lead,Sales,V,D
-Sebastien,Phlix,9 Nov 2020,Spain,Product Manager,Product Management,S,P
-Dries,Stevens,28 Sep 2020,Belgium,Sales Lead,Sales,D,S
-Florian,Gagnadre,7 Oct 2019,Global,Software Engineer,Engineering,F,G
-Anastasia,Melnichenko,17 Feb 2020,Global,Product Designer,Design and Research,A,M
-Charles,Gorintin,1 Jan 2016,Global,CTO,Co-founders,C,G
-Eva,Michon,24 Oct 2022,Belgium,Care Crew Lead,Care,E,M
-Julie,Rossi,18 Nov 2019,Global,Software Engineer,Engineering,J,R
-Lea,Vallerian,16 Dec 2019,France,Ops Coordinator,Operations,L,V
-Thomas,Quinot,6 Jul 2020,Global,Information security lead / CISO,Corporate,T,Q
-Margot,Debure,2 Aug 2021,France,Care Hiring Specialist,Care,M,D
-Maxime,Robinet,4 May 2020,Global,Product Designer,Design and Research,M,R
-Jibril,Kechidi,11 Apr 2022,France,Account Executive,Sales,J,K
-Vincent,Brachet,9 Apr 2018,France,Sales Crew Lead,Sales,V,B
-Anaïs,Persigan,14 Mar 2022,France,Customer Success Manager,Sales,A,P
-Brecht,Verhamme,4 May 2020,Global,Ops Builder,Operations,B,V
-Maryline,Lefebvre,16 Dec 2019,France,Ops Coordinator,Operations,M,L
-Christelle,Mozzati,14 Mar 2022,Global,Product Designer,Design and Research,C,M
-Thomas,Mollard,20 May 2019,Global,Software Engineer,Engineering,T,M
-Sophie,Lobel,27 Sep 2021,Belgium,User Care Expert,Care,S,L
-Ellen,Verleyen,15 Feb 2021,Global,Product Designer,Design and Research,E,V
-Tifenn,Boni,11 Oct 2021,Global,Sales Enabler,Business Strategy and Operations,T,B
-Jules,Poulet,26 Sep 2022,Belgium,User Care Expert,Care,J,P
-Jonathan,Orban,15 Mar 2021,Canada,Product Manager,Product Management,J,O
-Emilie,Vanopbrocke,25 May 2021,France,Account Executive,Sales,E,V
-François,Zannotti,31 Jan 2022,Global,Legal Counsel,Corporate,F,Z
-Megane,Kerres,7 Jun 2022,Belgium,Account Executive,Sales,M,K
-Marie-Line,Dhooge,23 May 2022,Belgium,Account Manager,Sales,M,D
-Marion,Cosson,4 Jan 2021,Global,Ops Builder,Operations,M,C
-Soline,Pulicani,13 Sep 2021,France,Account Executive,Sales,S,P
-Margot,Vanfleteren,22 Nov 2021,Belgium,User Care Expert,Care,M,V
-Jill,Tipton,7 Dec 2020,Global,User Researcher,Design and Research,J,T
-Paul,Desgrees du Lou,26 Apr 2021,France,Account Executive,Sales,P,D
-Heloïse,Poras,4 Nov 2019,Global,Ops Coordinator,Operations,H,P
-Diogo Oom Alves,Cardoso,31 Jan 2022,Global,Ops Builder,Operations,D,C
-Jessica,Segura Saura,16 Aug 2021,Spain,User Care Expert,Care,J,S
-Kevin,Aserraf,6 Mar 2017,Global,Product Marketing,Marketing,K,A
-Ujala,Anis,20 Jan 2020,Global,Community Lead,Design and Research,U,A
-Pierre-Auguste,Beaucote,31 Aug 2020,Global,Health Practitioner,Health practitioners,P,B
-Vincent,Lambert,12 Sep 2022,Global,Ops Builder,Operations,V,L
-Anaïs,Clog,15 Feb 2021,France,Customer Support Specialist - Public Sector,Care,A,C
-Cecile,Guirauden,21 Nov 2022,France,Sales Strategist,Business Strategy and Operations,C,G
-Lorin,Anthonis,12 Apr 2021,Belgium,Account Executive,Sales,L,A
-Benjamin,Benouarka,24 Sep 2018,Global,IT Ops Specialist,IT,B,B
-Guillaume,Pasdeloup,25 Apr 2022,Global,Ops Builder,Operations,G,P
-William,Earp,9 Nov 2020,Global,Software Engineer,Engineering,W,E
-Lucie,Paladino,7 Oct 2019,Global,Community Lead,Workplace,L,P
-Chaïmaa,Kadaoui,1 Mar 2021,Global,Security Engineer,Corporate,C,K
-Cyril,Vinot,3 Jul 2018,Global,Full Stack Data Scientist,Data,C,V
-Noemie,Duneton,14 Sep 2020,Global,Unit Associate,Associates,N,D
-Anna,Keroulle,26 Sep 2022,Global,Brand and Content,Marketing,A,K
-Mohamed Ghazi,Benabid,18 May 2020,Global,Sales Strategist,Business Strategy and Operations,M,B
-Celia,Barthel,25 Apr 2022,Global,Full Stack Data Scientist,Data,C,B
-Samy,Nouchy,7 Jun 2021,France,Account Executive,Sales,S,N
-Sarah,Decoster,19 Oct 2020,Belgium,Ops Coordinator,Operations,S,D
-Guillaume,Bessalem,5 Jul 2021,France,Insurance Products,Insurance,G,B
-Alexandre,Renault,3 Jan 2022,France,User Care Expert,Care,A,R
-Lorraine,Pipart,16 Sep 2019,France,Ops Coordinator,Operations,L,P
-Fabrice,Staad,1 Aug 2016,France,Unit Lead - France,Market and Bet Owners,F,S
-Alexandre,Gerlic,16 Sep 2019,Global,Community Lead,Engineering,A,G
-Laura,Gasparini,17 Jan 2022,Global,User Researcher,Design and Research,L,G
-Francisco Javier,Alemán Sánchez,12 Sep 2022,Global,Talent,Talent,F,A
-Aurelien,Cazes,1 Mar 2021,Belgium,Sales Strategist,Business Strategy and Operations,A,C
-Odile,Kusnik,28 Sep 2020,Canada,Insurance Products,Insurance,O,K
-Antoine,Bertin,31 Jan 2022,Global,Software Engineer,Engineering,A,B
-Eleonore,Adrian,1 Oct 2018,France,Sales Crew Lead,Sales,E,A
-Diego,Sanchez,15 Feb 2021,Spain,Sales Crew Lead,Sales,D,S
-Jean,Barloy,14 Jan 2019,Global,Software Engineer,Engineering,J,B
-Stef,Hamerlinck,14 Feb 2022,Global,Brand and Content,Marketing,S,H
-Paulo,Gemelgo,6 May 2019,France,Insurance Business,Insurance,P,G
-Robert,Zyskowski,23 May 2016,Global,Software Engineer,Engineering,R,Z
-Lisa,De Pauw,19 Dec 2022,Belgium,User Care Expert,Care,L,D
-Lotte,Bijlsma,14 Mar 2022,Global,Product Designer,Design and Research,L,B
-Fanette,Lopez,19 Aug 2019,France,Knowledge Specialist,Care,F,L
-Augustin,Mine,7 Jan 2019,France,Community Lead,Market and Bet Owners,A,M
-Matthieu,Chauvigny,14 Mar 2022,France,Risk lead,Insurance,M,C
-Chloe,Heidt,21 Nov 2022,Global,Sales Strategist,Business Strategy and Operations,C,H
-Cristina,Perez de Lope,8 Nov 2021,Spain,Marketing Lead,Marketing,C,P
-Julien,Plessis,4 Jul 2022,France,Account Executive,Sales,J,P
-Mihaela,Albu,12 Nov 2018,Global,Community Lead,Finance,M,A
-Simon,Perre,15 Jul 2019,Global,Ops Builder,Operations,S,P
-Tony,Sanchez,11 Apr 2022,Global,Software Engineer,Engineering,T,S
-Theo,Dammaretz,15 Mar 2021,Global,Software Engineer,Engineering,T,D
-Josephine,Gaillet,28 Sep 2020,France,Care Ops,Care,J,G
-Julie,Vertenten,14 Mar 2022,Belgium,Account Executive,Sales,J,V
-Estelle,Pasteau,20 Jul 2020,Global,Talent,Talent,E,P
-Virgile,Faury,29 Mar 2021,France,Account Executive,Sales,V,F
-Celine,Chu,7 Jun 2022,Global,Talent,Talent,C,C
-Mireya,Grizon Ruiz,16 Aug 2021,Spain,User Care Expert,Care,M,G
-Guillaume,Nevoux,1 Jul 2019,France,IT Ops Specialist,IT,G,N
-Aude,Vantyghem,17 Jan 2022,Global,People Ops,People,A,V
-Theo,Sermet,17 Aug 2020,France,Insurance Products,Insurance,T,S
-Kamilia,Bouraoui-Karoui,21 Nov 2022,Global,CRM manager,Business Strategy and Operations,K,B
-Emilie,Quellec,4 May 2020,France,Account Executive,Sales,E,Q
-Georges,Namet,1 Feb 2021,Global,Software Engineer,Engineering,G,N
-Benjamin,Dentaud,21 Jun 2021,France,Account Executive,Sales,B,D
-Thomas,Rolf,18 Jun 2018,Global,Community Lead,Product Management,T,R
-David,Merckle,7 Oct 2019,Global,Engineering Unit Referent,Engineering,D,M
-Laurene,Loubere,12 Sep 2022,Global,Ops Coordinator,Operations,L,L
-Vincent,Hirsch,15 Mar 2021,Global,Community Lead,Public Affairs,V,H
-Maï-thi,Van Cong Trang,29 Mar 2021,France,User Care Expert,Care,M,V
-Julien,Chenat,15 Oct 2018,Global,Product Designer,Design and Research,J,C
-Antoine,Lizee,9 May 2016,Global,Full Stack Data Scientist,Data,A,L
-Xavier,Puyau,30 Aug 2021,France,Sales Crew Lead,Sales,X,P
-Laetitia,Bordier,29 Aug 2022,Global,Talent,Talent,L,B
-Aurelie,Fliedel,31 Aug 2020,Global,Community Lead,Marketing,A,F
-Ariane,Bayat,15 Apr 2019,France,Sales Crew Lead,Sales,A,B
-Carlos,Targhetta,15 Mar 2021,Spain,Sales Strategist,Business Strategy and Operations,C,T
-Jean-Baptiste,Barth,11 Oct 2021,Global,Software Engineer,Engineering,J,B
-Sebastien,de Larquier,17 Aug 2020,Global,Community Lead,Data,S,d
-Margaux,Dereux,16 May 2022,France,Ops Builder,Operations,M,D
-Richard,Debot,8 Nov 2021,Belgium,Ops Coordinator,Operations,R,D
-Laure,Boutmy,4 Jan 2021,Global,UI Designer,Design and Research,L,B
-Sandra,May,19 Jul 2021,France,Talent,Talent,S,M
-Antoine,Jackson,17 Jun 2019,Global,Software Engineer,Engineering,A,J
-Caroline,Carre,2 Dec 2019,France,Care Crew Lead,Care,C,C
-Laurent,Guerin,15 Jun 2020,Global,Community Lead,Insurance,L,G
-Jorge,Buzzo,26 Apr 2021,Spain,Account Executive,Sales,J,B
-Naïm,Smutz,22 Oct 2018,France,Product Specialist,Care,N,S
-Kenza,Aboudrar,16 Aug 2021,Global,Ops Builder,Operations,K,A
-Matthias,Roy,14 Mar 2022,France,Account Executive,Sales,M,R
-Emilie,Gueble,14 Mar 2022,Global,People Ops,People,E,G
-Mathieu,Ghaleb,1 Jun 2020,Global,Software Engineer,Engineering,M,G
-Romain,Stourm,6 Apr 2020,France,Sales Crew Lead,Sales,R,S
-Thomas,Repichet,2 Sep 2019,France,Sales Crew Lead,Sales,T,R
-Mickael,Eymauzy,25 Apr 2022,France,Account Executive,Sales,M,E
-Thibault,Goustat,23 May 2022,Global,Ops Builder,Operations,T,G
-Rodrigo,Tico,18 Jul 2022,Spain,Account Executive,Sales,R,T
-Olivier,Sambourg,6 Jun 2017,Global,Software Engineer,Engineering,O,S
-Maylis,Ullenbruch,1 Feb 2021,France,Account Executive,Sales,M,U
-Clelia,Pavanetto,11 Oct 2021,Global,Product Content Manager,Design and Research,C,P
-Simon,Despretz,25 May 2021,France,Account Executive,Sales,S,D
-Flavie,de The,17 Jun 2019,Global,Full Stack Data Scientist,Data,F,d
-Yann,Callens,7 Jun 2022,France,Account Executive,Sales,Y,C
-Arthur,Ecoffet,10 Oct 2022,Global,Full Stack Data Scientist,Data,A,E
-Remi,Schockmel,1 Jul 2019,France,Sales Crew Lead,Sales,R,S
-Simon,Plard,28 Mar 2022,France,Business Development Representative,Sales,S,P
-Mallaury,Schmidt,8 Nov 2021,France,Ops Coordinator,Operations,M,S
-Emma,Lecomte,14 Mar 2022,Global,Product Manager,Product Management,E,L
-Thomas,Dudouet,3 Feb 2020,Global,Software Engineer,Engineering,T,D
-Valentine,Abbar,18 Jul 2022,Belgium,Ops Coordinator,Operations,V,A
-Maxence,Bouret,21 Oct 2019,Global,Software Engineer,Engineering,M,B
-Alexandre,Dubreuil,7 Dec 2020,Global,Software Engineer,Engineering,A,D
-Olivia,Mai,1 Feb 2021,Spain,Insurance Products,Insurance,O,M
-Leo,Andres,8 Jan 2018,France,Care Crew Lead,Care,L,A
-Lola,Lecasble,22 Nov 2021,Global,User Researcher,Design and Research,L,L
-Ivan,Shestunov,8 Nov 2021,Global,Product Designer,Design and Research,I,S
-Frederic,Bonnet,10 Oct 2022,Global,Software Engineer,Engineering,F,B
-Arnaud,Spanneut,15 Feb 2021,Global,Software Engineer,Engineering,A,S
-Padma Aiswarya,Kolisetty,10 May 2021,Global,Product Designer,Design and Research,P,K
-Claire,Lenfant-Kodia,3 Jan 2022,Global,Software Engineer,Engineering,C,L
-Nicolas,Zermati,26 Oct 2020,Global,Software Engineer,Engineering,N,Z
-Laurent,Thevenin,30 Aug 2021,France,Account Executive,Sales,L,T
-Adil,Chaudhry,29 Mar 2021,France,Insurance Products,Insurance,A,C
-Clement,Mennesson,4 Jun 2018,Global,Product Manager,Product Management,C,M
-Melanie,Alsberghe,21 Apr 2022,Global,Product Manager,Product Management,M,A
-Alexis,Bertholon,28 Feb 2022,Global,Talent,Talent,A,B
-Maxime,Le Bras,7 Dec 2020,Global,Community Lead,Talent,M,L
-Manou,Van de Walle,23 May 2022,Belgium,Account Executive,Sales,M,V
-Carlos Felipe,Gonzalez,14 Mar 2022,Spain,Business Development Representative,Sales,C,G
-Clara,Boville,25 Apr 2022,France,Account Executive,Sales,C,B
-Pierrick,Gicquelais,14 Mar 2022,Global,Software Engineer,Engineering,P,G
-Mathilde,Thomas,12 Sep 2022,France,Customer Success Manager,Sales,M,T
-Emma,Goldblum,1 Feb 2021,Global,Software Engineer,Engineering,E,G
-Hakim,Essabar,10 May 2021,France,Sales Crew Lead,Sales,H,E`;
 
         // Function to download a CSV file
         function triggerUserFileDownload(options) {
